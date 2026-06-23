@@ -1,0 +1,823 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Space+Mono&family=Lora:ital,wght@0,400;0,700;1,400&family=Caveat:wght@400;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    transition: background-color 1.5s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.container {
+    width: 100%;
+    max-width: 1600px;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    z-index: 10;
+    transition: opacity 1s ease;
+}
+
+.hidden { display: none !important; }
+.opacity-0 { opacity: 0 !important; }
+
+/* =========================================
+   THEME 1: SANDY SCRAPBOOK (Entry View)
+   ========================================= */
+
+.theme-sandy {
+    background-color: #F4E8D0;
+    color: #3F3122;
+    font-family: 'Lora', serif;
+}
+
+.grain-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    transition: opacity 1s ease;
+}
+
+#entry-view {
+    animation: fadeIn 1s ease;
+}
+
+#entry-view .header { text-align: center; }
+
+#entry-view .memory-tag {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    color: #D7C0A3;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.1em;
+}
+
+#entry-view .title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #3F3122;
+    letter-spacing: 0.05em;
+}
+
+#entry-view .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #D7C0A3, transparent);
+    margin: 1.5rem 0;
+}
+
+#entry-view .intro-section {
+    text-align: center;
+    font-family: 'Caveat', cursive;
+    font-size: 1.5rem;
+    color: #3F3122;
+    background: #F7EBD8;
+    padding: 3rem;
+    border: 1px dashed #D7C0A3;
+    border-radius: 4px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+    transform: rotate(-1deg);
+}
+
+#entry-view .intro-section p {
+    margin-bottom: 0.8rem;
+}
+
+.vintage-btn {
+    background-color: #B68A4C;
+    color: #F7EBD8;
+    border: none;
+    padding: 12px 30px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 2rem;
+    transition: all 0.3s ease;
+    transform: rotate(1deg);
+}
+
+.vintage-btn:hover {
+    background-color: #8D6E63;
+    transform: rotate(0deg) scale(1.05);
+}
+
+
+/* =========================================
+   THEME 2: DARK PLANETARIUM (Game View)
+   ========================================= */
+
+.theme-dark {
+    background-color: #050510;
+    color: #e0e5ff;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.starfield-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                      radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                      radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 2s ease;
+}
+
+.theme-dark .starfield-bg {
+    opacity: 0.3;
+}
+
+#planetarium-view {
+    animation: fadeIn 1.5s ease;
+}
+
+/* Image Section */
+.image-section {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-wrapper {
+    width: 100%;
+    height: 100%; 
+    overflow: hidden;
+    border: 2px solid #1e3a5f;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(77, 166, 255, 0.1);
+    background: #000;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative; /* important for absolute positioning inside */
+}
+
+/* Tints and Overlays for Part 2 */
+#image-tint-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 5;
+    transition: background-color 0.5s ease;
+    mix-blend-mode: screen; /* Or multiply/color depending on effect */
+}
+
+#image-tint-overlay.tint-blue {
+    background: rgba(0, 50, 255, 0.4);
+    mix-blend-mode: overlay;
+}
+
+#image-tint-overlay.tint-green {
+    background: rgba(0, 255, 100, 0.4);
+    mix-blend-mode: multiply;
+}
+
+#image-tint-overlay.tint-red {
+    background: rgba(255, 50, 50, 0.4);
+    mix-blend-mode: color-burn;
+}
+
+#image-tint-overlay.tint-yellow {
+    background: rgba(255, 200, 50, 0.3);
+    mix-blend-mode: overlay;
+}
+
+/* Hidden Numbers over planets */
+#hidden-numbers {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 6;
+}
+
+.hidden-number {
+    position: absolute;
+    font-family: 'Space Mono', monospace;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #00ffaa;
+    text-shadow: 0 0 10px #00ffaa, 0 0 20px #00ffaa, 0 0 30px #00ffaa;
+    opacity: 0;
+    transform: translate(-50%, -50%); /* Centers the number on the coordinate */
+    transition: opacity 1s ease;
+}
+
+#hidden-numbers.revealed .hidden-number {
+    opacity: 1;
+}
+
+/* Filter Buttons */
+.filter-btn {
+    background: transparent;
+    border: 2px solid #1e3a5f;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+}
+
+.filter-btn:hover {
+    border-color: #4da6ff;
+    opacity: 0.8;
+}
+
+.filter-btn.selected {
+    border-color: #00ffaa;
+    box-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.image-wrapper:hover {
+    box-shadow: 0 0 40px rgba(77, 166, 255, 0.2);
+}
+
+.planetarium-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Drag and Drop Styles */
+.draggable-item {
+    cursor: grab;
+    padding: 0.5rem 1rem;
+    border: 1px solid #4da6ff;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #4da6ff;
+    text-align: center;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.draggable-item:active {
+    cursor: grabbing;
+}
+
+.draggable-item.dragging {
+    opacity: 0.5;
+    border-style: dashed;
+}
+
+.drop-zone {
+    transition: all 0.2s ease;
+}
+
+.drop-zone.drag-over {
+    background: rgba(77, 166, 255, 0.2) !important;
+    border-color: #00ffaa !important;
+}
+
+/* =========================================
+   NOTEBOOK — 3D Realistic Book (4-Step)
+   ========================================= */
+
+.nb {
+    position: relative;
+    width: 750px;
+    height: 480px;
+    perspective: 1200px;
+    margin: 0 auto;
+}
+
+/* --- Spread (bottom layer) --- */
+.nb-spread {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 4px 8px 24px rgba(0,0,0,0.5);
+}
+
+.nb-page {
+    width: 50%;
+    height: 100%;
+    background-color: #f5eedc;
+    background-image: repeating-linear-gradient(transparent, transparent 27px, #c9dde8 28px);
+    position: relative;
+    overflow: hidden;
+}
+
+.nb-page-left {
+    border-right: 1px solid #c9b99f;
+    box-shadow: inset -8px 0 12px rgba(0,0,0,0.06);
+    border-radius: 6px 0 0 6px;
+}
+
+.nb-page-right {
+    box-shadow: inset 8px 0 12px rgba(0,0,0,0.06);
+    border-radius: 0 6px 6px 0;
+}
+
+.nb-page-inner {
+    padding: 2rem 1.5rem 1.5rem 2rem;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* --- Title Page (middle layer) — covers the FULL book --- */
+.nb-title-page {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: #f5eedc;
+    background-image: repeating-linear-gradient(transparent, transparent 27px, #c9dde8 28px);
+    z-index: 5;
+    border-radius: 6px;
+    box-shadow: 4px 8px 24px rgba(0,0,0,0.5);
+    overflow: hidden;
+    /* 3D page turn setup */
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.nb-title-page-inner {
+    width: 100%; height: 100%;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* --- Leather Cover (top layer) — starts fully closed --- */
+.nb-cover {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: 
+        radial-gradient(ellipse at 30% 20%, rgba(90,65,40,0.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(40,25,10,0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #5a3d28 0%, #4a3424 30%, #3c2a1a 70%, #2e1f12 100%);
+    z-index: 10;
+    border-radius: 6px;
+    box-shadow: 
+        4px 8px 24px rgba(0,0,0,0.6),
+        inset -3px 0 8px rgba(0,0,0,0.4),
+        inset 0 0 20px rgba(0,0,0,0.2);
+    cursor: pointer;
+    /* 3D page turn setup */
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.nb-cover:hover {
+    box-shadow: 
+        4px 8px 24px rgba(0,0,0,0.6),
+        inset -3px 0 8px rgba(0,0,0,0.4),
+        inset 0 0 20px rgba(0,0,0,0.2),
+        0 0 25px rgba(230,213,184,0.12);
+}
+
+.nb-cover-inner {
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.nb-cover-border {
+    border: 2px solid rgba(230,213,184,0.4);
+    padding: 1.5rem 2.5rem;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* --- 3D ANIMATION KEYFRAMES --- */
+
+/* Book slides in from below */
+@keyframes nbSlideIn {
+    0% { opacity: 0; transform: translateY(60px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.nb.nb-animate-in {
+    animation: nbSlideIn 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Cover opens: 3D rotateY to 90deg edge-on, then fades */
+@keyframes nbCoverOpen {
+    0%   { transform: rotateY(0deg); opacity: 1; }
+    65%  { transform: rotateY(-80deg); opacity: 1; }
+    100% { transform: rotateY(-95deg); opacity: 0; pointer-events: none; }
+}
+
+.nb-cover.nb-cover-opening {
+    animation: nbCoverOpen 1s ease-in-out forwards;
+}
+
+/* Title page turns: 3D rotateY to 90deg edge-on, then fades */
+@keyframes nbPageTurn {
+    0%   { transform: rotateY(0deg); opacity: 1; }
+    55%  { transform: rotateY(-75deg); opacity: 1; }
+    100% { transform: rotateY(-95deg); opacity: 0; pointer-events: none; }
+}
+
+.nb-title-page.nb-title-turning {
+    animation: nbPageTurn 0.8s ease-in-out forwards;
+}
+
+/* =========================================
+   ANIMATION SEQUENCE (simplified)
+   ========================================= */
+
+/* Clue Panel */
+.clue-panel {
+    background: rgba(10, 15, 37, 0.85);
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 10;
+    margin-bottom: 1rem;
+}
+
+.clue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e3a5f;
+    padding-bottom: 0.5rem;
+}
+
+.nav-btn {
+    background: transparent;
+    border: 1px solid #1e3a5f;
+    color: #4DA6FF;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: rgba(77, 166, 255, 0.1);
+    border-color: #4DA6FF;
+    box-shadow: 0 0 10px rgba(77, 166, 255, 0.4);
+}
+
+.clue-progress {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.orbitron-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    color: #4DA6FF;
+    letter-spacing: 0.1em;
+}
+
+#found-progress {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: #7a8ba3;
+    margin-top: 0.2rem;
+}
+
+/* Riddle Text */
+.riddle-container {
+    text-align: center;
+    min-height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+#riddle-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    white-space: pre-line;
+    color: #e0e5ff;
+    line-height: 1.4;
+}
+
+.status-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #00ffaa;
+    filter: drop-shadow(0 0 5px #00ffaa);
+}
+
+.action-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.w-full {
+    width: 100%;
+}
+
+/* Input Section */
+.input-section, .password-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.input-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: #4DA6FF;
+    letter-spacing: 0.1em;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 0.5rem;
+}
+
+input[type="text"] {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #1e3a5f;
+    padding: 0.6rem 1rem;
+    font-family: 'Space Mono', monospace;
+    color: #4DA6FF;
+    font-size: 1.1rem;
+    outline: none;
+    border-radius: 4px;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 0.1em;
+    width: 200px;
+}
+
+input[type="text"]:focus {
+    border-color: #4DA6FF;
+    box-shadow: 0 0 10px rgba(77, 166, 255, 0.4);
+}
+
+.cyber-btn {
+    background: transparent;
+    color: #4DA6FF;
+    border: 1px solid #4DA6FF;
+    padding: 0.6rem 1.5rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.cyber-btn:hover {
+    background: #4DA6FF;
+    color: #050510;
+    box-shadow: 0 0 15px rgba(77, 166, 255, 0.4);
+}
+
+.feedback {
+    font-size: 0.85rem;
+    font-family: 'Space Mono', monospace;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.feedback.error {
+    color: #ff4d4d;
+    text-shadow: 0 0 5px rgba(255, 77, 77, 0.5);
+}
+
+.feedback.success {
+    color: #00ffaa;
+    text-shadow: 0 0 5px rgba(0, 255, 170, 0.5);
+}
+
+.dark-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #1e3a5f, transparent);
+    margin: 0.5rem 0;
+}
+
+/* Completion Screen */
+#completion-screen {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(5, 5, 16, 0.95);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.completion-card {
+    background: rgba(10, 15, 37, 0.85);
+    border: 1px solid #1e3a5f;
+    padding: 3rem;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(77, 166, 255, 0.2);
+    text-align: center;
+    max-width: 600px;
+    animation: slideUp 0.8s ease forwards;
+}
+
+.glow-text {
+    text-shadow: 0 0 10px rgba(77, 166, 255, 0.4);
+}
+
+.success-title {
+    font-family: 'Orbitron', sans-serif;
+    color: #00ffaa;
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px rgba(0, 255, 170, 0.4);
+}
+
+.success-subtitle {
+    font-family: 'Space Mono', monospace;
+    color: #7a8ba3;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    margin-top: 0.5rem;
+}
+
+.revealed-message {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin: 1.5rem 0;
+    color: #e0e5ff;
+}
+
+.highlight-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    color: #7a8ba3;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.destination {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #4DA6FF;
+    letter-spacing: 0.1em;
+    margin-top: 0.5rem;
+}
+
+.journey-continues {
+    font-family: 'Space Mono', monospace;
+    color: #7a8ba3;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+.mt-4 { margin-top: 1.5rem; }
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Glitch Effect Styles */
+.glitch-flash {
+    animation: flash 0.1s infinite;
+}
+
+@keyframes flash {
+    0% { background: rgba(0, 0, 0, 0.9); }
+    50% { background: rgba(255, 0, 0, 0.5); }
+    100% { background: rgba(0, 255, 0, 0.5); }
+}
+
+.glitch-text {
+    position: relative;
+    display: inline-block;
+    color: #ff3366;
+    animation: glitch-skew 1s infinite linear alternate-reverse;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+}
+
+.glitch-text::before {
+    left: 2px;
+    text-shadow: -2px 0 #00ffaa;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch-text::after {
+    left: -2px;
+    text-shadow: -2px 0 #ff3366;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim2 5s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+    0% { clip: rect(78px, 9999px, 83px, 0); transform: skew(0.57deg); }
+    5% { clip: rect(6px, 9999px, 86px, 0); transform: skew(0.39deg); }
+    10% { clip: rect(4px, 9999px, 2px, 0); transform: skew(0.91deg); }
+    15% { clip: rect(87px, 9999px, 12px, 0); transform: skew(0.48deg); }
+    20% { clip: rect(100px, 9999px, 13px, 0); transform: skew(0.49deg); }
+    25% { clip: rect(10px, 9999px, 32px, 0); transform: skew(0.18deg); }
+    30% { clip: rect(1px, 9999px, 42px, 0); transform: skew(0.45deg); }
+    35% { clip: rect(81px, 9999px, 44px, 0); transform: skew(0.32deg); }
+    40% { clip: rect(16px, 9999px, 42px, 0); transform: skew(0.01deg); }
+    45% { clip: rect(58px, 9999px, 20px, 0); transform: skew(0.24deg); }
+    50% { clip: rect(6px, 9999px, 22px, 0); transform: skew(0.1deg); }
+    55% { clip: rect(75px, 9999px, 3px, 0); transform: skew(0.94deg); }
+    60% { clip: rect(32px, 9999px, 78px, 0); transform: skew(0.06deg); }
+    65% { clip: rect(37px, 9999px, 41px, 0); transform: skew(0.07deg); }
+    70% { clip: rect(33px, 9999px, 9px, 0); transform: skew(0.53deg); }
+    75% { clip: rect(72px, 9999px, 14px, 0); transform: skew(0.77deg); }
+    80% { clip: rect(96px, 9999px, 63px, 0); transform: skew(0.96deg); }
+    85% { clip: rect(98px, 9999px, 34px, 0); transform: skew(0.33deg); }
+    90% { clip: rect(51px, 9999px, 31px, 0); transform: skew(0.7deg); }
+    95% { clip: rect(4px, 9999px, 46px, 0); transform: skew(0.3deg); }
+    100% { clip: rect(63px, 9999px, 18px, 0); transform: skew(0.81deg); }
+}
+
+@keyframes glitch-anim2 {
+    0% { clip: rect(71px, 9999px, 37px, 0); transform: skew(0.3deg); }
+    5% { clip: rect(92px, 9999px, 86px, 0); transform: skew(0.09deg); }
+    10% { clip: rect(81px, 9999px, 7px, 0); transform: skew(0.72deg); }
+    15% { clip: rect(66px, 9999px, 90px, 0); transform: skew(0.86deg); }
+    20% { clip: rect(40px, 9999px, 8px, 0); transform: skew(0.93deg); }
+    25% { clip: rect(6px, 9999px, 57px, 0); transform: skew(0.71deg); }
+    30% { clip: rect(10px, 9999px, 54px, 0); transform: skew(0.74deg); }
+    35% { clip: rect(24px, 9999px, 20px, 0); transform: skew(0.08deg); }
+    40% { clip: rect(3px, 9999px, 9px, 0); transform: skew(0.06deg); }
+    45% { clip: rect(38px, 9999px, 66px, 0); transform: skew(0.48deg); }
+    50% { clip: rect(31px, 9999px, 17px, 0); transform: skew(0.5deg); }
+    55% { clip: rect(19px, 9999px, 7px, 0); transform: skew(0.18deg); }
+    60% { clip: rect(43px, 9999px, 46px, 0); transform: skew(0.58deg); }
+    65% { clip: rect(94px, 9999px, 73px, 0); transform: skew(0.68deg); }
+    70% { clip: rect(47px, 9999px, 56px, 0); transform: skew(0.3deg); }
+    75% { clip: rect(39px, 9999px, 84px, 0); transform: skew(0.02deg); }
+    80% { clip: rect(38px, 9999px, 21px, 0); transform: skew(0.53deg); }
+    85% { clip: rect(17px, 9999px, 17px, 0); transform: skew(0.38deg); }
+    90% { clip: rect(100px, 9999px, 16px, 0); transform: skew(0.52deg); }
+    95% { clip: rect(64px, 9999px, 35px, 0); transform: skew(0.3deg); }
+    100% { clip: rect(95px, 9999px, 56px, 0); transform: skew(0.81deg); }
+}
+
+@keyframes glitch-skew {
+    0% { transform: skew(0deg); }
+    10% { transform: skew(-5deg); }
+    20% { transform: skew(5deg); }
+    30% { transform: skew(0deg); }
+    100% { transform: skew(0deg); }
+}

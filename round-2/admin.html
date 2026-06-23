@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Round 2 Admin</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .container {
+            background-color: #2a2a2a;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #4a4a4a;
+        }
+        h1 { color: #A67C52; }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #8D6E63;
+        }
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            background: #111;
+            border: 1px solid #4a4a4a;
+            color: #fff;
+            font-family: inherit;
+        }
+        button {
+            background-color: #A67C52;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+        }
+        button:hover { background-color: #8D6E63; }
+        #status {
+            margin-top: 10px;
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Round 2 Admin Config</h1>
+        <p>This configuration is saved securely to this device's LocalStorage.</p>
+        
+        <div class="form-group">
+            <label for="password-input">Final Password Override:</label>
+            <input type="text" id="password-input" placeholder="Leave blank for default (2B8A8CFFFF)">
+        </div>
+        
+        <button id="btn-save">Save Configuration</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        const passInput = document.getElementById('password-input');
+        const btnSave = document.getElementById('btn-save');
+        const statusText = document.getElementById('status');
+
+        // Load existing
+        const existing = localStorage.getItem('round2_password');
+        if (existing) {
+            passInput.value = existing;
+        }
+
+        btnSave.addEventListener('click', () => {
+            const val = passInput.value.trim().toUpperCase();
+            if (val) {
+                localStorage.setItem('round2_password', val);
+                statusText.innerText = "Password saved! (" + val + ")";
+            } else {
+                localStorage.removeItem('round2_password');
+                statusText.innerText = "Password reset to default (2B8A8CFFFF).";
+            }
+            setTimeout(() => { statusText.innerText = ""; }, 3000);
+        });
+    </script>
+</body>
+</html>

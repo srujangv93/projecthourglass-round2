@@ -1,0 +1,6 @@
+node_modules/
+.next/
+*.zip
+update_extracted/
+__pycache__/
+.DS_Store

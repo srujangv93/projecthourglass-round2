@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory 02</title>
+    <!-- External Styles -->
+    <link rel="stylesheet" href="style_v7.css">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- ANTI-INSPECT SCRIPT -->
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.keyCode == 123) event.preventDefault(); // F12
+            if (event.ctrlKey && event.shiftKey && (event.keyCode === 73 || event.keyCode === 74)) event.preventDefault(); // Ctrl+Shift+I/J
+            if (event.ctrlKey && event.keyCode === 85) event.preventDefault(); // Ctrl+U
+        });
+        
+        // Anti-Copy Script
+        document.addEventListener('copy', event => event.preventDefault());
+        document.addEventListener('cut', event => event.preventDefault());
+        document.addEventListener('paste', event => event.preventDefault());
+        
+    </script>
+    <style>
+        /* Disable text selection */
+        body {
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+        }
+        /* Allow text selection in inputs */
+        input, textarea {
+            -webkit-user-select: auto;
+            -ms-user-select: auto;
+            user-select: auto;
+        }
+    </style>
+</head>
+<body class="theme-sandy">
+    <!-- Shared Backgrounds -->
+    <div class="grain-overlay" id="grain-overlay"></div>
+    <div class="starfield-bg hidden" id="starfield-bg"></div>
+
+    <!-- ENTRY VIEW (Sandy Scrapbook Theme) -->
+    <div id="entry-view" class="container">
+        <header class="header">
+            <h4 class="memory-tag">MEMORY 02</h4>
+            <h1 class="title">FIELD TRIP TO THE PLANETARIUM</h1>
+            <div class="divider"></div>
+        </header>
+
+        <section class="intro-section">
+            <p>Years ago, your class visited a planetarium.</p>
+            <p>You remember entering the dome.</p>
+            <p>You remember looking up.</p>
+            <p>You remember the stars.</p>
+            <p>But some details have been forgotten.</p>
+            <p>Take a closer look.</p>
+            <p>The answers are hidden among the planets.</p>
+            
+            <button id="btn-enter" class="vintage-btn">ENTER PLANETARIUM</button>
+        </section>
+    </div>
+
+    <!-- PLANETARIUM VIEW (Dark Theme) -->
+    <div id="planetarium-view" class="container hidden">
+        <!-- Part 1 Content Container -->
+        <div id="part1-layout" style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 1600px; margin: 0 auto;">
+            
+            <!-- Top Section: Image -->
+            <section class="image-section" style="width: 100%;">
+                <div class="image-wrapper" id="planetarium-image-wrapper">
+                    <div id="image-tint-overlay"></div>
+                    <img src="planetarium.png" alt="Planetarium View" class="planetarium-image" id="planetarium-img">
+                    <div id="hidden-numbers" class="hidden">
+                        <span class="hidden-number" style="top: 45%; left: 22%;">56</span> <!-- Mars -->
+                        <span class="hidden-number" style="top: 35%; left: 40%;">34</span> <!-- Jupiter -->
+                        <span class="hidden-number" style="top: 40%; left: 82%;">01</span> <!-- Saturn -->
+                        <span class="hidden-number" style="top: 60%; left: 65%;">54</span> <!-- Polaris -->
+                        <span class="hidden-number" style="top: 65%; left: 38%;">12</span> <!-- Satellite Wing -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Side-by-Side Wrapper for Clues and Drag/Drop -->
+            <div style="display: flex; flex-direction: row; gap: 2rem; width: 100%; align-items: flex-start; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">
+                
+                <!-- Bottom Panel: Clue System -->
+                <section class="clue-panel" id="clue-panel" style="flex: 1; min-width: 400px; max-width: 600px;">
+                <div id="clue-tab">
+                    
+                    <div class="memory-tabs" style="display: flex; flex-direction: row; justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid #1e3a5f; padding-bottom: 1rem; padding-left: 0.5rem; padding-right: 0.5rem; scrollbar-width: thin; scrollbar-color: #4da6ff transparent;">
+                        <button class="memory-tab-btn cyber-btn selected" data-index="0" style="flex-shrink: 0;">Memory 01</button>
+                        <button class="memory-tab-btn cyber-btn" data-index="1" style="flex-shrink: 0;">Memory 02</button>
+                        <button class="memory-tab-btn cyber-btn" data-index="2" style="flex-shrink: 0;">Memory 03</button>
+                        <button class="memory-tab-btn cyber-btn" data-index="3" style="flex-shrink: 0;">Memory 04</button>
+                        <button class="memory-tab-btn cyber-btn" data-index="4" style="flex-shrink: 0;">Memory 05</button>
+                        <button id="btn-scroll-down" class="cyber-btn" style="flex-shrink: 0; border-color: #00ffaa; color: #00ffaa; margin-left: auto;">SOLVE &darr;</button>
+                    </div>
+
+                    <div id="riddle-view">
+                        <div class="riddle-container">
+                            <h3 id="current-clue-label" class="orbitron-text" style="color: #4da6ff; font-size: 1.2rem; margin-top: 0;">MEMORY FRAGMENT 01</h3>
+                            <p id="riddle-text" style="white-space: pre-line; line-height: 1.6; font-family: 'Space Mono', monospace;">Loading memory fragment...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interstitial: Restore the Memory (Drag and Drop) -->
+            <div id="drag-drop-view" style="flex: 1.5; display: flex; flex-direction: row; gap: 1rem; min-width: 600px; align-items: flex-start; justify-content: center; position: relative;">
+                
+                <!-- Sidebar: Available Celestials -->
+                <div style="flex: 1; max-width: 300px; background: rgba(10, 15, 37, 0.85); border: 1px solid #1e3a5f; border-radius: 8px; padding: 1rem; backdrop-filter: blur(10px);">
+                    <h3 class="orbitron-text text-center" style="color: #4da6ff; font-size: 1.1rem; border-bottom: 1px solid #1e3a5f; padding-bottom: 0.5rem; margin-top: 0; margin-bottom: 1rem;">AVAILABLE CELESTIALS</h3>
+                    <div id="drag-source-container" style="display: flex; flex-direction: column; gap: 0.5rem; min-height: 400px;">
+                        <!-- Draggable items will be populated by JS to easily randomize them, or static here -->
+                        <div class="draggable-item cyber-btn" draggable="true" id="item-mercury">Mercury</div>
+                        <div class="draggable-item cyber-btn" draggable="true" id="item-mars">Mars</div>
+                        <div class="draggable-item cyber-btn" draggable="true" id="item-jupiter">Jupiter</div>
+                        <div class="draggable-item cyber-btn" draggable="true" id="item-saturn">Saturn</div>
+                        <div class="draggable-item cyber-btn" draggable="true" id="item-uranus">Uranus</div>
+                        <div class="draggable-item cyber-btn" draggable="true" id="item-neptune">Neptune</div>
+                        <div class="draggable-item cyber-btn" draggable="true" id="item-moon">Moon</div>
+                        <div class="draggable-item cyber-btn" draggable="true" id="item-polaris">Polaris</div>
+                        <div class="draggable-item cyber-btn" draggable="true" id="item-satellite">Satellite Wing</div>
+                    </div>
+                </div>
+
+                <!-- Main Area: Drop Zones -->
+                <div style="flex: 2; max-width: 600px; background: rgba(10, 15, 37, 0.85); border: 1px solid #1e3a5f; border-radius: 8px; padding: 2rem; backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center;">
+                    <h2 class="orbitron-text text-center" style="font-size: 1.5rem; margin-top: 0; margin-bottom: 1rem; color: #fff;">RESTORE THE MEMORY</h2>
+                    <div style="font-family: 'Space Mono', monospace; font-size: 0.9rem; color: #e0e5ff; margin-bottom: 2rem;">
+                        <p>You found their identities.</p>
+                        <p>Now place the forgotten celestials in the order they were remembered.</p>
+                    </div>
+
+                    <div id="drop-zones-container" style="display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 400px;">
+                        <div class="drop-zone-wrapper" style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-family: 'Space Mono', monospace; color: #4da6ff; width: 80px; text-align: right;">Position 1</span>
+                            <div class="drop-zone" data-pos="1" style="flex: 1; min-height: 40px; border: 2px dashed #4da6ff; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);"></div>
+                        </div>
+                        <div class="drop-zone-wrapper" style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-family: 'Space Mono', monospace; color: #4da6ff; width: 80px; text-align: right;">Position 2</span>
+                            <div class="drop-zone" data-pos="2" style="flex: 1; min-height: 40px; border: 2px dashed #4da6ff; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);"></div>
+                        </div>
+                        <div class="drop-zone-wrapper" style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-family: 'Space Mono', monospace; color: #4da6ff; width: 80px; text-align: right;">Position 3</span>
+                            <div class="drop-zone" data-pos="3" style="flex: 1; min-height: 40px; border: 2px dashed #4da6ff; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);"></div>
+                        </div>
+                        <div class="drop-zone-wrapper" style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-family: 'Space Mono', monospace; color: #4da6ff; width: 80px; text-align: right;">Position 4</span>
+                            <div class="drop-zone" data-pos="4" style="flex: 1; min-height: 40px; border: 2px dashed #4da6ff; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);"></div>
+                        </div>
+                        <div class="drop-zone-wrapper" style="display: flex; align-items: center; gap: 1rem;">
+                            <span style="font-family: 'Space Mono', monospace; color: #4da6ff; width: 80px; text-align: right;">Position 5</span>
+                            <div class="drop-zone" data-pos="5" style="flex: 1; min-height: 40px; border: 2px dashed #4da6ff; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);"></div>
+                        </div>
+                    </div>
+
+                    <div class="action-container" style="margin-top: 2rem; width: 100%; max-width: 400px; text-align: center;">
+                        <button id="btn-verify-sequence" class="cyber-btn w-full">VERIFY SEQUENCE</button>
+                        <p id="sequence-feedback" style="font-family: 'Space Mono', monospace; font-size: 0.9rem; margin-top: 1rem; min-height: 20px;"></p>
+                    </div>
+                </div>
+            </div>
+
+            </div> <!-- End Side-by-Side Wrapper -->
+
+        </div>
+
+            <!-- Part 2 View: The Guide's Glasses -->
+            <div id="part2-view" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 0.5rem;">
+                
+                <div style="display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 0.5rem;">
+                    <button id="btn-back-from-part2" class="cyber-btn" style="position: absolute; left: 0; padding: 0.3rem 0.8rem; font-size: 0.8rem; border-color: #ff3366; color: #ff3366;">&larr; BACK</button>
+                    <h2 class="orbitron-text" style="font-size: 1.2rem; margin: 0;">THE GUIDE'S GLASSES</h2>
+                </div>
+                
+                <div class="text-center" style="font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #e0e5ff; margin-bottom: 0.5rem;">
+                    <p>The colours revealed their identities.</p>
+                    <p>The identities revealed their secrets.</p>
+                    <p>But the secrets were never meant to be seen all at once.</p>
+                    <p>The guide insisted on using several lenses in succession.</p>
+                    <p>We remember the secret existed.</p>
+                    <p>We do not remember the order.</p>
+                </div>
+
+                <div class="text-center">
+                    <div style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 0.5rem;">
+                        <button class="filter-btn" data-color="Red">🔴</button>
+                        <button class="filter-btn" data-color="Yellow">🟡</button>
+                        <button class="filter-btn" data-color="Green">🟢</button>
+                        <button class="filter-btn" data-color="Blue">🔵</button>
+                    </div>
+                    <p style="font-family: 'Rajdhani', sans-serif; font-size: 1rem; color: #fff;">Current Selection: <span id="current-filters" style="color: #4da6ff;">None</span></p>
+                    <p id="filter-feedback" style="font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #a0aabf; margin-top: 0.2rem;">Nothing unusual appears.</p>
+                </div>
+
+                <!-- ========== THE GUIDE'S NOTEBOOK ========== -->
+                <div id="notebook-panel" class="hidden" style="flex: 1; display: flex; justify-content: center; align-items: center; padding: 2rem 0;">
+                    
+                    <div class="nb" id="notebook-book">
+
+                        <!-- LAYER 1 (bottom): Two-page spread — the final puzzle pages -->
+                        <div class="nb-spread">
+                            <!-- Left Page: Cryptic Notes -->
+                            <div class="nb-page nb-page-left">
+                                <div class="nb-page-inner">
+                                    <h3 style="font-family: 'Lora', serif; font-size: 1.5rem; font-weight: bold; margin: 0 0 0.3rem 0; color: #2c2c2c;">The Guide's Notebook</h3>
+                                    <div style="font-family: 'Lora', serif; color: #3a3b3c; font-size: 0.95rem; line-height: 1.7; margin-top: 0.5rem;">
+                                        <p>Most people read everything.</p>
+                                        <p>I never did.</p>
+                                        <p>The beginning is where they usually make their first mistake.</p>
+                                        <p style="margin-top: 0.5rem; font-style: italic; color: #5a3c3c; line-height: 1.4;">To most people they were just colours. To those who looked closely, they were identities waiting to be discovered. Find the right worlds, and their identities will lead you to the answer.</p>
+                                    </div>
+                                    <div style="font-family: 'Caveat', cursive; color: #1a365d; font-size: 1.5rem; font-weight: bold; margin-top: 0.5rem; padding-left: 1rem;">
+                                        <div style="transform: rotate(-2deg); margin-bottom: 0.1rem; margin-left: 10px;">45</div>
+                                        <div style="transform: rotate(3deg); margin-bottom: 0.1rem; margin-left: 30px;">23</div>
+                                        <div style="transform: rotate(-1deg); margin-bottom: 0.1rem; margin-left: 5px;">01</div>
+                                        <div style="transform: rotate(4deg); margin-bottom: 0.1rem; margin-left: 40px;">54</div>
+                                        <div style="transform: rotate(-3deg); margin-bottom: 0.1rem; margin-left: 20px;">12</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Right Page: Satellite Sketch -->
+                            <div class="nb-page nb-page-right">
+                                <div class="nb-page-inner" style="display: flex; justify-content: center; align-items: center; position: relative;">
+                                    <div style="position: absolute; bottom: 25px; right: 35px; font-family: 'Caveat', cursive; color: #1a365d; font-size: 1.2rem; transform: rotate(1deg);">
+                                        Begin from nothing.
+                                    </div>
+                                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="width: 250px; height: 250px; transform: rotate(5deg); opacity: 0.85;">
+                                        <ellipse cx="100" cy="100" rx="90" ry="30" fill="none" stroke="#1a365d" stroke-width="1" stroke-dasharray="4,4" transform="rotate(-15 100 100)" />
+                                        <circle cx="20" cy="40" r="1" fill="#1a365d" /><circle cx="160" cy="20" r="1.5" fill="#1a365d" />
+                                        <circle cx="180" cy="140" r="1" fill="#1a365d" /><circle cx="40" cy="160" r="1" fill="#1a365d" />
+                                        <path d="M 30,100 L 32,102 L 34,100 L 32,98 Z" fill="#1a365d" />
+                                        <rect x="85" y="80" width="30" height="40" rx="3" fill="none" stroke="#1a365d" stroke-width="2" />
+                                        <line x1="85" y1="90" x2="115" y2="90" stroke="#1a365d" stroke-width="1" />
+                                        <line x1="85" y1="100" x2="115" y2="100" stroke="#1a365d" stroke-width="1" />
+                                        <line x1="85" y1="110" x2="115" y2="110" stroke="#1a365d" stroke-width="1" />
+                                        <rect x="35" y="90" width="45" height="20" fill="none" stroke="#1a365d" stroke-width="2" />
+                                        <line x1="50" y1="90" x2="50" y2="110" stroke="#1a365d" stroke-width="1" />
+                                        <line x1="65" y1="90" x2="65" y2="110" stroke="#1a365d" stroke-width="1" />
+                                        <line x1="35" y1="100" x2="80" y2="100" stroke="#1a365d" stroke-width="1" />
+                                        <rect x="120" y="90" width="45" height="20" fill="none" stroke="#1a365d" stroke-width="2" />
+                                        <line x1="135" y1="90" x2="135" y2="110" stroke="#1a365d" stroke-width="1" />
+                                        <line x1="150" y1="90" x2="150" y2="110" stroke="#1a365d" stroke-width="1" />
+                                        <line x1="120" y1="100" x2="165" y2="100" stroke="#1a365d" stroke-width="1" />
+                                        <line x1="80" y1="100" x2="85" y2="100" stroke="#1a365d" stroke-width="2" />
+                                        <line x1="115" y1="100" x2="120" y2="100" stroke="#1a365d" stroke-width="2" />
+                                        <path d="M 100,80 L 90,60 M 100,80 L 110,60 M 90,60 Q 100,50 110,60" fill="none" stroke="#1a365d" stroke-width="2" />
+                                        <circle cx="100" cy="65" r="2" fill="#1a365d" />
+                                        <line x1="100" y1="80" x2="100" y2="65" stroke="#1a365d" stroke-width="2" />
+                                        <text x="30" y="70" font-family="'Caveat', cursive" font-size="12" fill="#1a365d" transform="rotate(-10 30 70)">Solar Array</text>
+                                        <path d="M 45,75 Q 50,85 45,90" fill="none" stroke="#1a365d" stroke-width="1" stroke-dasharray="2,2" marker-end="url(#nb-arrow)" />
+                                        <text x="140" y="50" font-family="'Caveat', cursive" font-size="12" fill="#1a365d" transform="rotate(5 140 50)">Comm Link</text>
+                                        <path d="M 135,55 Q 120,60 112,62" fill="none" stroke="#1a365d" stroke-width="1" stroke-dasharray="2,2" marker-end="url(#nb-arrow)" />
+                                        <defs><marker id="nb-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#1a365d" /></marker></defs>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LAYER 2 (middle): Title Page — covers entire book -->
+                        <div class="nb-title-page" id="nb-title-page">
+                            <div class="nb-title-page-inner">
+                                <div style="text-align: center; padding-top: 5rem;">
+                                    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.2rem; color: #2c2c2c; letter-spacing: 0.05em; margin: 0;">THE GUIDE'S NOTEBOOK</h2>
+                                    <div style="width: 120px; height: 1px; background: linear-gradient(90deg, transparent, #a09786, transparent); margin: 1.5rem auto;"></div>
+                                    <p style="font-family: 'Lora', serif; font-size: 1.1rem; color: #5a5a5a; font-style: italic; margin-top: 1rem;">Recovered Memory Fragment</p>
+                                </div>
+                                <div style="position: absolute; bottom: 60px; left: 0; right: 0; text-align: center;">
+                                    <p style="font-family: 'Caveat', cursive; font-size: 1.3rem; color: #7a6b5a; transform: rotate(-2deg);">Property of the Planetarium Guide</p>
+                                </div>
+                                <div style="position: absolute; bottom: 20px; right: 25px;">
+                                    <button id="btn-next-page" class="vintage-btn" style="padding: 8px 20px; font-size: 0.95rem; transform: rotate(-1deg);">Next Page ➦</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LAYER 3 (top): Leather Book Cover — starts fully closed -->
+                        <div class="nb-cover" id="nb-cover">
+                            <div class="nb-cover-inner">
+                                <div class="nb-cover-border">
+                                    <h2 style="font-family: 'Playfair Display', serif; color: #e6d5b8; text-shadow: 1px 1px 3px rgba(0,0,0,0.6); font-size: 2rem; letter-spacing: 0.08em; margin: 0;">THE GUIDE'S</h2>
+                                    <h2 style="font-family: 'Playfair Display', serif; color: #e6d5b8; text-shadow: 1px 1px 3px rgba(0,0,0,0.6); font-size: 2rem; letter-spacing: 0.08em; margin: 0.2rem 0 0 0;">NOTEBOOK</h2>
+                                </div>
+                                <p class="nb-cover-hint" style="position: absolute; bottom: 20px; font-family: 'Caveat', cursive; font-size: 1rem; color: rgba(230,213,184,0.5);">Click to open</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div id="extraction-workspace" class="hidden" style="margin-top: 0.5rem;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                        <input type="text" id="final-part2-password" style="text-align: center; width: 100%; max-width: 300px; padding: 0.5rem; background: #000; border: 1px solid #4da6ff; color: #00ffaa; font-family: 'Space Mono', monospace; border-radius: 4px;" placeholder="COMBINED PASSWORD" maxlength="20" autocomplete="off" spellcheck="false">
+                        <!-- Multi-inputs removed in favor of single input -->
+                        <button id="btn-reveal-message" class="cyber-btn" style="width: 100%; max-width: 300px;" disabled>REVEAL HIDDEN MESSAGE</button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+
+    <!-- Completion Screen (Dark Theme) -->
+    <div id="completion-screen" class="hidden">
+        <div class="completion-card">
+            <h2 class="success-title glow-text">MEMORY RECOVERED</h2>
+            <h3 class="success-subtitle">FIELD TRIP TO THE PLANETARIUM</h3>
+            <div class="dark-divider"></div>
+            
+            <div class="revealed-message">
+                <p>You sat beneath the stars,</p>
+                <p>but the next memory does not lie in the sky.</p>
+                <p>The memories you seek are arranged one after another,</p>
+                <p>waiting to tell their story.</p>
+                <p class="highlight-text mt-4">Your next destination is:</p>
+                <p class="destination glow-text">THE TIMELINE</p>
+            </div> <!-- end main container -->
+
+    </div> <!-- end main container -->
+            
+            <div class="dark-divider"></div>
+            <p class="journey-continues">The Journey Continues...</p>
+            <button id="btn-continue" class="cyber-btn mt-4">CONTINUE TO NEXT MEMORY</button>
+        </div>
+    </div>
+
+    <script src="script_v7.js"></script>
+</body>
+</html>
