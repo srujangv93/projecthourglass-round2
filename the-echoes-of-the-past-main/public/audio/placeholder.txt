@@ -1,0 +1,11 @@
+This directory stores the nostalgic MP3 sound clips for LivingRoom.exe:
+- cartoon1.mp3
+- cartoon2.mp3
+- cartoon3.mp3
+- ad1.mp3
+- ad2.mp3
+- ad3.mp3
+- distorted1.mp3
+- distorted2.mp3
+
+If these files are missing, the system will dynamically synthesize fallback warning chimes and beeps.

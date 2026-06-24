@@ -1,0 +1,2496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Project Rewind Phase 1 — Restore Sam's childhood memory through interactive exploration.">
+  <title>Project Rewind — Memory Reconstruction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Orbitron:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   ROOT VARIABLES — WARM NOSTALGIC PALETTE
+   ================================================================ */
+:root {
+  --wall: #F5E6CC;
+  --wall-pattern: #EED9B7;
+  --floor: #B8860B;
+  --floor-light: #D4A843;
+  --wood: #8B5E3C;
+  --wood-dark: #5C3A1E;
+  --wood-light: #C19A6B;
+  --evening-gold: #FFB347;
+  --evening-warm: #FF8C42;
+  --evening-glow: rgba(255, 179, 71, 0.35);
+  --cream: #FFF8E7;
+  --soft-pink: #FFD1DC;
+  --curtain-red: #A63D40;
+  --curtain-dark: #7A2C2E;
+  --sky-top: #FF6B35;
+  --sky-mid: #FF9E5E;
+  --sky-bottom: #FFD700;
+  --bedsheet-blue: #6B9AC4;
+  --bedsheet-stripe: #5A85AE;
+  --success: #6BCB77;
+  --error: #E07A5F;
+  --text-dark: #3D2B1F;
+  --text-warm: #8B5E3C;
+  --text-light: #FFF8E7;
+  --accent-cyan: #00f3ff;
+  --accent-violet: #bd00ff;
+  --sci-dark: #030309;
+  --glass: rgba(10, 10, 28, 0.6);
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-hand: 'Caveat', cursive;
+  --font-mono: 'Share Tech Mono', monospace;
+  --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: #1a120b;
+  color: var(--text-dark);
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #2a1a0e; }
+::-webkit-scrollbar-thumb { background: rgba(255,179,71,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--evening-gold); }
+
+.hidden { display: none !important; }
+
+canvas#particles-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 0; pointer-events: none;
+}
+
+/* ================================================================
+   PHASE CONTAINERS
+   ================================================================ */
+.phase {
+  position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  display: flex; justify-content: center; align-items: center;
+  z-index: 10;
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.phase.fade-out {
+  opacity: 0; transform: scale(0.97);
+  pointer-events: none;
+}
+
+/* ================================================================
+   INTRO PHASE
+   ================================================================ */
+#phase-intro {
+  background: radial-gradient(ellipse at center, #2a1a0e 0%, #0d0805 100%);
+}
+
+.intro-card {
+  text-align: center;
+  max-width: 550px;
+  padding: 50px 40px;
+  background: rgba(30, 18, 10, 0.7);
+  border: 1px solid rgba(255, 179, 71, 0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(255,179,71,0.08);
+}
+
+.intro-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  color: var(--evening-gold);
+  border: 1px solid rgba(255,179,71,0.3);
+  padding: 5px 15px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+  text-shadow: 0 0 8px rgba(255,179,71,0.3);
+}
+
+.intro-card h1 {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #fff, rgba(255,220,180,0.9));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.intro-card h2 {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 1.1rem;
+  color: var(--evening-gold);
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+}
+
+.intro-desc {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: rgba(255,248,231,0.6);
+  margin-bottom: 40px;
+}
+
+.btn-warm {
+  background: linear-gradient(135deg, var(--evening-warm), var(--evening-gold));
+  color: #1a0d05;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 14px 40px;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(255,140,66,0.35);
+  transition: var(--transition);
+}
+
+.btn-warm:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(255,140,66,0.5);
+}
+
+/* ================================================================
+   ROOM PHASE
+   ================================================================ */
+#phase-room {
+  background: radial-gradient(ellipse at 50% 40%, #3d2a18 0%, #1a120b 100%);
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.room-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  background: linear-gradient(180deg, rgba(26,18,11,0.9) 0%, transparent 100%);
+}
+
+.room-header-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--evening-gold);
+  opacity: 0.7;
+}
+
+.room-container {
+  width: 100%;
+  max-width: 1100px;
+  height: 75vh;
+  max-height: 650px;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(255,179,71,0.08);
+}
+
+/* BACK WALL */
+.room-wall {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 65%;
+  background: var(--wall);
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, var(--wall-pattern) 39px, var(--wall-pattern) 40px);
+}
+
+/* FLOOR */
+.room-floor {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 38%;
+  background: linear-gradient(180deg, #A0785A 0%, #8B6E4E 100%);
+  background-image:
+    repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(0,0,0,0.06) 79px, rgba(0,0,0,0.06) 80px);
+}
+
+.floor-rug {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55%;
+  height: 45%;
+  background: linear-gradient(135deg, #C16F55, #B85C4A, #A04E3C);
+  border: 4px solid #8B3E2F;
+  border-radius: 8px;
+  opacity: 0.6;
+}
+
+/* WINDOW */
+.room-window {
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 170px;
+  z-index: 20;
+}
+
+.window-frame {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 40%, var(--sky-bottom) 100%);
+  border: 10px solid var(--wood-dark);
+  border-radius: 6px 6px 4px 4px;
+  position: relative;
+  box-shadow: 0 0 50px var(--evening-glow), inset 0 0 25px rgba(255,215,0,0.15);
+  overflow: hidden;
+}
+
+.window-cross-v {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 8px;
+  background: var(--wood-dark);
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.window-cross-h {
+  position: absolute;
+  left: 0; right: 0;
+  top: 48%;
+  height: 8px;
+  background: var(--wood-dark);
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+/* Sun disc */
+.window-sun {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, #FFF8DC 0%, #FFD700 50%, rgba(255,165,0,0.3) 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 30px #FFD700, 0 0 60px rgba(255,165,0,0.5);
+}
+
+/* Light rays */
+.window-rays {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 250px;
+  background: linear-gradient(180deg, rgba(255,215,0,0.12) 0%, transparent 100%);
+  clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Curtains */
+.curtain {
+  position: absolute;
+  top: -15px;
+  width: 55px;
+  height: 195px;
+  border-radius: 0 0 8px 8px;
+  z-index: 22;
+}
+
+.curtain-left {
+  left: -35px;
+  background: linear-gradient(180deg, var(--curtain-red), var(--curtain-dark));
+  transform: perspective(200px) rotateY(8deg);
+}
+
+.curtain-right {
+  right: -35px;
+  background: linear-gradient(180deg, var(--curtain-red), var(--curtain-dark));
+  transform: perspective(200px) rotateY(-8deg);
+}
+
+.curtain-rod {
+  position: absolute;
+  top: -20px;
+  left: -45px;
+  right: -45px;
+  height: 8px;
+  background: linear-gradient(90deg, #8B6914, #D4A843, #8B6914);
+  border-radius: 4px;
+  z-index: 25;
+}
+
+/* FAIRY LIGHTS */
+.fairy-lights {
+  position: absolute;
+  top: 4%;
+  left: 8%;
+  right: 8%;
+  display: flex;
+  justify-content: space-between;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.fairy-light {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor, 0 0 12px currentColor;
+  animation: twinkle 2s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.4; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+.fairy-wire {
+  position: absolute;
+  top: 4.3%;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: rgba(0,0,0,0.15);
+  z-index: 29;
+  pointer-events: none;
+}
+
+/* BED */
+.room-bed {
+  position: absolute;
+  right: 5%;
+  bottom: 34%;
+  width: 280px;
+  height: 120px;
+  z-index: 18;
+}
+
+.bed-frame {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, var(--wood-light), var(--wood));
+  border: 3px solid var(--wood-dark);
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
+
+.bed-mattress {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 15px;
+  background: linear-gradient(135deg, var(--bedsheet-blue), var(--bedsheet-stripe));
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bed-mattress::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(45deg,
+    transparent, transparent 10px,
+    rgba(255,255,255,0.06) 10px, rgba(255,255,255,0.06) 12px);
+}
+
+.bed-pillow {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  width: 70px;
+  height: 40px;
+  background: linear-gradient(135deg, #fff8f0, #ede0cc);
+  border-radius: 10px 10px 6px 6px;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
+}
+
+.bed-stuffed-toy {
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  font-size: 2rem;
+  filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));
+  animation: toy-breathe 3s ease-in-out infinite;
+}
+
+@keyframes toy-breathe {
+  0%, 100% { transform: scale(1) rotate(-5deg); }
+  50% { transform: scale(1.05) rotate(0deg); }
+}
+
+.bed-headboard {
+  position: absolute;
+  top: -35px;
+  left: -3px;
+  right: -3px;
+  height: 40px;
+  background: linear-gradient(180deg, var(--wood-dark), var(--wood));
+  border-radius: 8px 8px 0 0;
+  border: 3px solid var(--wood-dark);
+}
+
+/* STUDY TABLE */
+.room-table {
+  position: absolute;
+  left: 5%;
+  bottom: 34%;
+  width: 260px;
+  height: 110px;
+  z-index: 18;
+}
+
+.table-surface {
+  width: 100%;
+  height: 55px;
+  background: linear-gradient(180deg, #C8A882, var(--wood-light));
+  border: 3px solid var(--wood);
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.table-legs {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 15px;
+}
+
+.table-leg {
+  width: 12px;
+  height: 55px;
+  background: linear-gradient(90deg, var(--wood), var(--wood-dark));
+  border-radius: 0 0 3px 3px;
+}
+
+/* Items on table */
+.table-books {
+  position: absolute;
+  left: 10px;
+  top: -30px;
+  display: flex;
+  gap: 3px;
+}
+
+.table-book {
+  width: 18px;
+  height: 28px;
+  border-radius: 2px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+.table-pencil-holder {
+  position: absolute;
+  right: 15px;
+  top: -28px;
+  width: 22px;
+  height: 30px;
+  background: #5c8a8a;
+  border-radius: 3px 3px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding-top: 2px;
+}
+
+.pencil-stick {
+  width: 2px;
+  height: 18px;
+  border-radius: 1px;
+}
+
+.table-lamp {
+  position: absolute;
+  right: 50px;
+  top: -45px;
+  font-size: 1.6rem;
+  filter: drop-shadow(0 0 10px rgba(255,200,100,0.4));
+}
+
+/* NOTEBOOK CLUE */
+.table-notebook {
+  position: absolute;
+  left: 50%;
+  top: -35px;
+  transform: translateX(-50%);
+  width: 85px;
+  height: 55px;
+  background: linear-gradient(135deg, #fefae0, #f0e6c0);
+  border: 1.5px solid #d4c89a;
+  border-radius: 2px 6px 6px 2px;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: 30;
+  padding: 6px 8px;
+  overflow: hidden;
+}
+
+.table-notebook:hover {
+  transform: translateX(-50%) scale(1.08);
+  box-shadow: 2px 5px 15px rgba(0,0,0,0.3), 0 0 15px rgba(255,179,71,0.2);
+}
+
+.table-notebook::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: repeating-linear-gradient(180deg,
+    #d4c89a 0px, #d4c89a 2px, transparent 2px, transparent 6px);
+  border-right: 1px solid #c4b88a;
+}
+
+.notebook-text {
+  font-family: var(--font-hand);
+  font-size: 0.52rem;
+  color: #5a4a30;
+  line-height: 1.35;
+  margin-left: 8px;
+  pointer-events: none;
+}
+
+/* SHELF */
+.room-shelf {
+  position: absolute;
+  right: 8%;
+  top: 10%;
+  width: 130px;
+  z-index: 18;
+}
+
+.shelf-plank {
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, var(--wood-dark), var(--wood), var(--wood-dark));
+  border-radius: 2px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+  margin-bottom: 2px;
+}
+
+.shelf-items {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 6px;
+  height: 40px;
+  margin-bottom: 5px;
+}
+
+.shelf-mini-book {
+  width: 14px;
+  border-radius: 2px;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+}
+
+.shelf-clock {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #FFF8DC;
+  border: 2px solid var(--wood-dark);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.5rem;
+  font-family: var(--font-mono);
+  color: var(--text-dark);
+  box-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+
+.shelf-globe {
+  font-size: 1.3rem;
+  animation: globe-spin 20s linear infinite;
+}
+
+@keyframes globe-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* POSTERS */
+.room-poster {
+  position: absolute;
+  border: 4px solid var(--wood);
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.25);
+  z-index: 18;
+  overflow: hidden;
+}
+
+.poster-1 {
+  top: 8%;
+  left: 10%;
+  width: 80px;
+  height: 65px;
+  background: linear-gradient(135deg, #FFD700, #FF8C00);
+}
+
+.poster-2 {
+  top: 12%;
+  left: 28%;
+  width: 65px;
+  height: 80px;
+  background: linear-gradient(135deg, #4ECDC4, #44A08D);
+}
+
+.poster-text {
+  font-family: var(--font-display);
+  font-size: 0.4rem;
+  color: rgba(255,255,255,0.8);
+  letter-spacing: 1px;
+  position: absolute;
+  bottom: 4px;
+}
+
+/* EVENING GLOW OVERLAY */
+.evening-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 50% 15%, rgba(255,215,0,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 25;
+}
+
+/* BOXES */
+.boxes-area {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 50px;
+  z-index: 35;
+}
+
+.memory-box {
+  width: 110px;
+  height: 95px;
+  background: linear-gradient(145deg, #D2B48C, #C4A373);
+  border: 2.5px solid #8B6914;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 3px 5px 12px rgba(0,0,0,0.35);
+}
+
+.memory-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 18px;
+  background: linear-gradient(180deg, #BFA06B, #C4A373);
+  border-bottom: 2px solid #8B6914;
+  border-radius: 3px 3px 0 0;
+}
+
+.memory-box:hover {
+  transform: translateY(-8px) scale(1.06);
+  box-shadow: 3px 12px 25px rgba(0,0,0,0.4), 0 0 20px var(--evening-glow);
+}
+
+.box-emoji {
+  font-size: 1.8rem;
+  margin-top: 8px;
+  filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+}
+
+.box-label {
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+/* NOTEBOOK POPUP */
+.notebook-popup {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  background: linear-gradient(135deg, #fefae0, #f5ecd0);
+  border: 2px solid #c4b88a;
+  border-radius: 4px 12px 12px 4px;
+  padding: 35px 30px 30px 40px;
+  z-index: 9000;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  animation: popIn 0.4s ease;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.notebook-popup::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 18px;
+  background: repeating-linear-gradient(180deg,
+    #d4c89a 0px, #d4c89a 3px, transparent 3px, transparent 8px);
+  border-right: 1.5px solid #b8a87a;
+}
+
+.notebook-popup-text {
+  font-family: var(--font-hand);
+  font-size: 1.35rem;
+  color: #4a3a20;
+  line-height: 1.7;
+}
+
+.notebook-popup-close {
+  position: absolute;
+  top: 10px; right: 14px;
+  background: none; border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #8a7a5a;
+  transition: var(--transition);
+}
+
+.notebook-popup-close:hover { color: var(--text-dark); }
+
+.notebook-popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 8999;
+}
+
+/* ROOM TOOLTIP */
+.room-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,18,10,0.9);
+  color: var(--cream);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 50;
+}
+
+.memory-box:hover .room-tooltip,
+.table-notebook:hover .room-tooltip,
+.room-bed:hover .room-tooltip {
+  opacity: 1;
+}
+
+/* ================================================================
+   WRONG BOX PHASE
+   ================================================================ */
+#phase-wrong-box {
+  background: radial-gradient(ellipse at center, #1a2233 0%, #0a0e18 100%);
+  flex-direction: column;
+  gap: 30px;
+}
+
+.wrong-box-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: #8fa8c8;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.wrong-items-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  max-width: 500px;
+}
+
+.wrong-item {
+  background: rgba(100, 130, 180, 0.1);
+  border: 1px solid rgba(100, 130, 180, 0.2);
+  border-radius: 8px;
+  padding: 15px 10px;
+  text-align: center;
+  animation: wrongFadeIn 0.5s ease forwards;
+  opacity: 0;
+}
+
+@keyframes wrongFadeIn {
+  to { opacity: 1; }
+}
+
+.wrong-item-emoji { font-size: 1.6rem; margin-bottom: 6px; }
+.wrong-item-name { font-size: 0.7rem; color: rgba(140,160,200,0.7); font-family: var(--font-mono); }
+
+.wrong-message {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: rgba(200, 180, 160, 0.8);
+  font-style: italic;
+  text-align: center;
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+.btn-try-again {
+  background: transparent;
+  border: 1px solid rgba(255,179,71,0.3);
+  color: var(--evening-gold);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  padding: 10px 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-try-again:hover {
+  background: rgba(255,179,71,0.1);
+  border-color: var(--evening-gold);
+  box-shadow: 0 0 15px rgba(255,179,71,0.2);
+}
+
+/* ================================================================
+   OBJECTS GALLERY PHASE
+   ================================================================ */
+#phase-objects {
+  background: radial-gradient(ellipse at center, #2a1a0e 0%, #0d0805 100%);
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 40px 20px;
+  align-items: center;
+}
+
+.objects-header {
+  text-align: center;
+  margin-bottom: 30px;
+  flex-shrink: 0;
+}
+
+.objects-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: #fff;
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+
+.objects-header p {
+  font-size: 0.85rem;
+  color: rgba(255,248,231,0.5);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.objects-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  max-width: 900px;
+  width: 100%;
+}
+
+.object-card {
+  background: rgba(40, 28, 16, 0.8);
+  border: 1.5px solid rgba(255, 179, 71, 0.15);
+  border-radius: 10px;
+  padding: 18px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  animation: cardFadeIn 0.4s ease forwards;
+  opacity: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes cardFadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.object-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(255,179,71,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.object-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  border-color: var(--evening-gold);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4), 0 0 15px rgba(255,179,71,0.15);
+}
+
+.object-card:active {
+  transform: scale(0.97);
+}
+
+.object-emoji {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.object-card:hover .object-emoji {
+  transform: scale(1.15) rotate(-3deg);
+  animation: wiggle 0.5s ease;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: scale(1.15) rotate(0deg); }
+  25% { transform: scale(1.15) rotate(-5deg); }
+  75% { transform: scale(1.15) rotate(5deg); }
+}
+
+.object-name {
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  color: var(--cream);
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.object-desc {
+  font-size: 0.65rem;
+  color: rgba(255,248,231,0.4);
+  line-height: 1.4;
+  display: none;
+}
+
+.object-card:hover .object-desc { display: block; }
+
+.object-card.selected {
+  border-color: var(--success);
+  background: rgba(107, 203, 119, 0.1);
+  box-shadow: 0 0 15px rgba(107, 203, 119, 0.2);
+}
+
+.object-card.selected .object-emoji {
+  animation: none;
+  transform: scale(1.1);
+}
+
+.object-card.wrong-select {
+  border-color: var(--error);
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+.btn-continue {
+  margin-top: 25px;
+  flex-shrink: 0;
+}
+
+/* ================================================================
+   RIDDLE PHASE
+   ================================================================ */
+#phase-riddles {
+  background: radial-gradient(ellipse at center, #2a1a0e 0%, #0d0805 100%);
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 30px 20px;
+  align-items: center;
+}
+
+.riddle-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 25px;
+  flex-shrink: 0;
+}
+
+.riddle-progress {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--evening-gold);
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.riddle-box {
+  background: rgba(40, 28, 16, 0.7);
+  border: 1px solid rgba(255, 179, 71, 0.25);
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.riddle-text {
+  font-family: var(--font-hand);
+  font-size: 1.45rem;
+  color: var(--cream);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.riddle-instruction {
+  font-size: 0.8rem;
+  color: rgba(255,248,231,0.4);
+  margin-top: 15px;
+}
+
+/* ================================================================
+   DRAG AND DROP PHASE
+   ================================================================ */
+#phase-dragdrop {
+  background: radial-gradient(ellipse at center, #1a140d 0%, #0d0805 100%);
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 30px 20px;
+  align-items: center;
+  gap: 25px;
+}
+
+.dragdrop-title {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.dragdrop-title h2 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: #fff;
+  letter-spacing: 3px;
+  margin-bottom: 6px;
+}
+
+.dragdrop-title p {
+  font-size: 0.8rem;
+  color: rgba(255,248,231,0.45);
+}
+
+/* RECONSTRUCTION BOARD */
+.reconstruction-board {
+  display: flex;
+  gap: 15px;
+  padding: 25px;
+  background: rgba(30, 18, 10, 0.6);
+  border: 1.5px dashed rgba(255, 179, 71, 0.3);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.drop-slot {
+  width: 100px;
+  height: 120px;
+  border: 2px dashed rgba(255, 179, 71, 0.2);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: var(--transition);
+  background: rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.drop-slot.drag-over {
+  border-color: var(--evening-gold);
+  background: rgba(255,179,71,0.08);
+  box-shadow: 0 0 15px rgba(255,179,71,0.15);
+}
+
+.drop-slot.filled {
+  border-style: solid;
+  border-color: var(--success);
+  background: rgba(107,203,119,0.08);
+}
+
+.drop-slot.filled.wrong-order {
+  border-color: var(--error);
+  background: rgba(224,122,95,0.08);
+}
+
+.slot-number {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: rgba(255,179,71,0.35);
+  letter-spacing: 1px;
+}
+
+.slot-label {
+  font-size: 0.6rem;
+  color: rgba(255,248,231,0.3);
+  font-family: var(--font-mono);
+  margin-top: 4px;
+}
+
+.slot-placed-emoji {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+
+.slot-placed-name {
+  font-family: var(--font-hand);
+  font-size: 0.75rem;
+  color: var(--cream);
+}
+
+/* DRAGGABLE OBJECTS */
+.draggable-objects {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.draggable-item {
+  width: 90px;
+  height: 100px;
+  background: rgba(40, 28, 16, 0.8);
+  border: 1.5px solid rgba(255, 179, 71, 0.2);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: grab;
+  transition: var(--transition);
+  touch-action: none;
+}
+
+.draggable-item:hover {
+  border-color: var(--evening-gold);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.draggable-item:active { cursor: grabbing; }
+
+.draggable-item.dragging {
+  opacity: 0.4;
+}
+
+.draggable-item .object-emoji { font-size: 1.6rem; margin-bottom: 5px; }
+.draggable-item .object-name { font-family: var(--font-hand); font-size: 0.75rem; color: var(--cream); }
+
+/* DRAG CLONE */
+.drag-clone {
+  position: fixed;
+  width: 90px;
+  height: 100px;
+  background: rgba(40, 28, 16, 0.95);
+  border: 2px solid var(--evening-gold);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 99999;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 20px rgba(255,179,71,0.2);
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.drag-clone .object-emoji { font-size: 1.6rem; }
+.drag-clone .object-name { font-family: var(--font-hand); font-size: 0.75rem; color: var(--cream); }
+
+/* VERIFY BUTTON */
+.btn-verify {
+  flex-shrink: 0;
+}
+
+/* ================================================================
+   STATUS MESSAGES
+   ================================================================ */
+.status-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9500;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(5px);
+}
+
+.status-card {
+  text-align: center;
+  padding: 40px 50px;
+  border-radius: 12px;
+  animation: popIn 0.4s ease;
+}
+
+.status-card.success {
+  background: rgba(20, 40, 20, 0.9);
+  border: 1px solid rgba(107, 203, 119, 0.4);
+  box-shadow: 0 0 40px rgba(107, 203, 119, 0.15);
+}
+
+.status-card.failure {
+  background: rgba(40, 20, 16, 0.9);
+  border: 1px solid rgba(224, 122, 95, 0.4);
+  box-shadow: 0 0 40px rgba(224, 122, 95, 0.15);
+}
+
+.status-icon { font-size: 2.5rem; margin-bottom: 15px; }
+
+.status-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.status-card.success .status-title { color: var(--success); }
+.status-card.failure .status-title { color: var(--error); }
+
+.status-subtitle {
+  font-size: 0.85rem;
+  color: rgba(255,248,231,0.5);
+  margin-bottom: 25px;
+}
+
+/* ================================================================
+   FINAL PHASE — PHOTO REVEAL
+   ================================================================ */
+#phase-final {
+  background: #0d0805;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.restoration-bar {
+  width: 300px;
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.restoration-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--evening-gold), var(--success));
+  transition: width 1s ease;
+}
+
+.final-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: var(--evening-gold);
+  opacity: 0.6;
+}
+
+.photo-frame {
+  width: 380px;
+  height: 280px;
+  background: #fff;
+  padding: 15px 15px 40px 15px;
+  border-radius: 4px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.photo-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.photo-image svg {
+  width: 100%;
+  height: 100%;
+}
+
+.photo-caption {
+  position: absolute;
+  bottom: 8px;
+  left: 15px;
+  font-family: var(--font-hand);
+  font-size: 0.9rem;
+  color: #5a4a30;
+}
+
+/* GLITCH EFFECTS */
+.photo-frame.glitching {
+  animation: photo-shake 0.15s infinite;
+}
+
+@keyframes photo-shake {
+  0% { transform: translate(0); }
+  25% { transform: translate(-3px, 2px); }
+  50% { transform: translate(3px, -2px); }
+  75% { transform: translate(-2px, -3px); }
+  100% { transform: translate(2px, 3px); }
+}
+
+.glitch-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 3px;
+  background: rgba(255, 0, 100, 0.6);
+  z-index: 10;
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+
+.photo-frame.glitching .glitch-line {
+  animation: glitch-scan 0.3s infinite;
+}
+
+@keyframes glitch-scan {
+  0% { top: 0%; opacity: 0; }
+  20% { top: 30%; opacity: 1; }
+  40% { top: 60%; opacity: 0.5; }
+  60% { top: 40%; opacity: 1; }
+  80% { top: 80%; opacity: 0.8; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.corruption-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(0deg,
+    transparent 0px, transparent 2px,
+    rgba(255, 0, 80, 0.1) 2px, rgba(255, 0, 80, 0.1) 4px);
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.corruption-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 3px;
+  color: #ff3366;
+  text-shadow: 0 0 15px rgba(255, 51, 102, 0.6);
+  z-index: 20;
+  opacity: 0;
+  text-align: center;
+  line-height: 2;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* MEMORY PARTICLES */
+.memory-particle {
+  position: fixed;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9000;
+  animation: particle-rise 2s ease-out forwards;
+}
+
+@keyframes particle-rise {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-120px) scale(0.3); }
+}
+
+/* ================================================================
+   RESTORATION EFFECTS
+   ================================================================ */
+.vignette-warm {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(255,179,71,0.08) 100%);
+  pointer-events: none;
+  z-index: 8;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 768px) {
+  .objects-grid { grid-template-columns: repeat(3, 1fr); }
+  .wrong-items-grid { grid-template-columns: repeat(2, 1fr); }
+  .reconstruction-board { flex-wrap: wrap; justify-content: center; padding: 15px; gap: 10px; }
+  .drop-slot { width: 80px; height: 95px; }
+  .draggable-item { width: 75px; height: 85px; }
+  .room-container { height: 65vh; }
+  .photo-frame { width: 280px; height: 210px; }
+  .intro-card h1 { font-size: 1.6rem; }
+  .room-bed { width: 200px; height: 90px; right: 3%; }
+  .room-table { width: 200px; left: 3%; }
+  .boxes-area { gap: 30px; }
+  .memory-box { width: 90px; height: 80px; }
+}
+
+@media (max-width: 480px) {
+  .objects-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .reconstruction-board { gap: 8px; padding: 10px; }
+  .drop-slot { width: 60px; height: 80px; }
+  .draggable-item { width: 65px; height: 75px; }
+  .riddle-text { font-size: 1.15rem; }
+  .room-poster { display: none; }
+  .room-shelf { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- WARM AMBIENT PARTICLES -->
+<canvas id="particles-canvas"></canvas>
+<div class="vignette-warm" id="vignette-warm"></div>
+
+<!-- ================================================================
+     PHASE: INTRO
+     ================================================================ -->
+<section class="phase" id="phase-intro">
+  <div class="intro-card">
+    <div class="intro-badge">PROJECT REWIND — PHASE 1</div>
+    <h1>MEMORY RECONSTRUCTION</h1>
+    <h2>Sam's Bedroom</h2>
+    <p class="intro-desc">
+      A fragment of Sam's childhood memory has been detected but it's fading fast.
+      Explore the room, find the right memories, and restore them before they vanish forever.
+    </p>
+    <button class="btn-warm" id="btn-start">BEGIN RECONSTRUCTION</button>
+  </div>
+</section>
+
+<!-- ================================================================
+     PHASE: ROOM EXPLORATION
+     ================================================================ -->
+<section class="phase hidden" id="phase-room">
+  <div class="room-header">
+    <span class="room-header-label">// MEMORY_SECTOR: SAM_BEDROOM.EXE</span>
+    <span class="room-header-label">INTEGRITY: <strong id="lbl-integrity">38%</strong></span>
+  </div>
+
+  <div class="room-container" id="room-container">
+    <!-- BACK WALL -->
+    <div class="room-wall"></div>
+
+    <!-- FLOOR -->
+    <div class="room-floor">
+      <div class="floor-rug"></div>
+    </div>
+
+    <!-- EVENING OVERLAY -->
+    <div class="evening-overlay"></div>
+
+    <!-- FAIRY WIRE -->
+    <div class="fairy-wire"></div>
+
+    <!-- FAIRY LIGHTS -->
+    <div class="fairy-lights" id="fairy-lights"></div>
+
+    <!-- WINDOW -->
+    <div class="room-window">
+      <div class="curtain-rod"></div>
+      <div class="curtain curtain-left"></div>
+      <div class="curtain curtain-right"></div>
+      <div class="window-frame">
+        <div class="window-cross-v"></div>
+        <div class="window-cross-h"></div>
+        <div class="window-sun"></div>
+      </div>
+      <div class="window-rays"></div>
+    </div>
+
+    <!-- POSTERS -->
+    <div class="room-poster poster-1">⚡<span class="poster-text">HEROES</span></div>
+    <div class="room-poster poster-2">🚀<span class="poster-text">SPACE</span></div>
+
+    <!-- SHELF -->
+    <div class="room-shelf">
+      <div class="shelf-items">
+        <div class="shelf-mini-book" style="height:30px; background:#e74c3c;"></div>
+        <div class="shelf-mini-book" style="height:26px; background:#3498db;"></div>
+        <div class="shelf-mini-book" style="height:32px; background:#2ecc71;"></div>
+        <div class="shelf-clock">6:05</div>
+        <div class="shelf-globe">🌍</div>
+      </div>
+      <div class="shelf-plank"></div>
+      <div class="shelf-items" style="height:30px;">
+        <div class="shelf-mini-book" style="height:22px; background:#9b59b6;"></div>
+        <div class="shelf-mini-book" style="height:25px; background:#f39c12;"></div>
+        <span style="font-size:1rem;">🧸</span>
+        <div class="shelf-mini-book" style="height:20px; background:#1abc9c;"></div>
+      </div>
+      <div class="shelf-plank"></div>
+    </div>
+
+    <!-- STUDY TABLE -->
+    <div class="room-table">
+      <div class="table-surface">
+        <div class="table-books">
+          <div class="table-book" style="height:25px; background:#e74c3c;"></div>
+          <div class="table-book" style="height:30px; background:#2980b9;"></div>
+          <div class="table-book" style="height:22px; background:#27ae60;"></div>
+        </div>
+        <div class="table-pencil-holder">
+          <div class="pencil-stick" style="background:#f1c40f;"></div>
+          <div class="pencil-stick" style="background:#e74c3c;"></div>
+          <div class="pencil-stick" style="background:#3498db;"></div>
+        </div>
+        <div class="table-lamp">🪔</div>
+        <div class="table-notebook" id="notebook-clue">
+          <div class="notebook-text">"To move forward, focus on the present, not the future."</div>
+          <div class="room-tooltip">📓 Open notebook</div>
+        </div>
+      </div>
+      <div class="table-legs">
+        <div class="table-leg"></div>
+        <div class="table-leg"></div>
+      </div>
+    </div>
+
+    <!-- BED -->
+    <div class="room-bed">
+      <div class="bed-headboard"></div>
+      <div class="bed-frame">
+        <div class="bed-mattress"></div>
+        <div class="bed-pillow"></div>
+        <div class="bed-stuffed-toy">🐻</div>
+      </div>
+      <div class="room-tooltip">Sam's bed</div>
+    </div>
+
+    <!-- BOXES -->
+    <div class="boxes-area">
+      <div class="memory-box" id="box-a" data-box="A">
+        <div class="box-emoji">📦</div>
+        <div class="box-label">Box A</div>
+        <div class="room-tooltip">Click to open</div>
+      </div>
+      <div class="memory-box" id="box-b" data-box="B">
+        <div class="box-emoji">📦</div>
+        <div class="box-label">Box B</div>
+        <div class="room-tooltip">Click to open</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     PHASE: WRONG BOX
+     ================================================================ -->
+<section class="phase hidden" id="phase-wrong-box">
+  <div class="wrong-box-title">BOX OPENED</div>
+  <div class="wrong-items-grid" id="wrong-items-grid"></div>
+  <p class="wrong-message">These don't belong in Sam's childhood memories...<br>Something feels off. Try the other box.</p>
+  <button class="btn-try-again" id="btn-try-again">← RETURN TO ROOM</button>
+</section>
+
+<!-- ================================================================
+     PHASE: OBJECTS GALLERY
+     ================================================================ -->
+<section class="phase hidden" id="phase-objects">
+  <div class="objects-header">
+    <h2>MEMORY FRAGMENTS FOUND</h2>
+    <p>Sam's childhood belongings — explore each one. A riddle awaits...</p>
+  </div>
+  <div class="objects-grid" id="objects-grid"></div>
+  <button class="btn-warm btn-continue hidden" id="btn-to-riddles">PROCEED TO RIDDLES →</button>
+</section>
+
+<!-- ================================================================
+     PHASE: RIDDLES
+     ================================================================ -->
+<section class="phase hidden" id="phase-riddles">
+  <div class="riddle-container">
+    <div class="riddle-progress" id="riddle-progress">RIDDLE 1 / 5</div>
+    <div class="riddle-box">
+      <div class="riddle-text" id="riddle-text"></div>
+      <p class="riddle-instruction">Select the matching object below</p>
+    </div>
+  </div>
+  <div class="objects-grid" id="riddle-objects-grid"></div>
+</section>
+
+<!-- ================================================================
+     PHASE: DRAG & DROP
+     ================================================================ -->
+<section class="phase hidden" id="phase-dragdrop">
+  <div class="dragdrop-title">
+    <h2>MEMORY RECONSTRUCTION BOARD</h2>
+    <p>Drag each memory into the correct sequence to restore Sam's timeline</p>
+  </div>
+  <div class="reconstruction-board" id="reconstruction-board"></div>
+  <div class="draggable-objects" id="draggable-objects"></div>
+  <button class="btn-warm btn-verify hidden" id="btn-verify">VERIFY SEQUENCE</button>
+</section>
+
+<!-- ================================================================
+     PHASE: FINAL PHOTO
+     ================================================================ -->
+<section class="phase hidden" id="phase-final">
+  <div class="final-label" id="final-label">RECONSTRUCTING MEMORY...</div>
+  <div class="restoration-bar"><div class="restoration-fill" id="restoration-fill"></div></div>
+  <div class="photo-frame" id="photo-frame">
+    <div class="photo-image" id="photo-image">
+      <svg viewBox="0 0 350 210" xmlns="http://www.w3.org/2000/svg">
+        <!-- Sky/Background -->
+        <rect width="350" height="210" fill="#87CEEB" rx="2"/>
+        <rect y="140" width="350" height="70" fill="#7EC850"/>
+        <!-- School building hint -->
+        <rect x="20" y="50" width="60" height="90" fill="#D4A76A" rx="2"/>
+        <rect x="28" y="60" width="18" height="18" fill="#87CEEB" stroke="#8B6914" stroke-width="1"/>
+        <rect x="54" y="60" width="18" height="18" fill="#87CEEB" stroke="#8B6914" stroke-width="1"/>
+        <rect x="38" y="100" width="16" height="40" fill="#8B4513" rx="1"/>
+        <!-- Tree -->
+        <circle cx="310" cy="90" r="30" fill="#3D8B37"/>
+        <rect x="305" y="110" width="10" height="35" fill="#6B4226"/>
+        <!-- Children figures -->
+        <g id="child-1" class="child-figure">
+          <circle cx="100" cy="115" r="10" fill="#FFD1A4"/>
+          <rect x="92" y="125" width="16" height="25" fill="#E74C3C" rx="2"/>
+          <rect x="92" y="150" width="7" height="12" fill="#2C3E50"/>
+          <rect x="101" y="150" width="7" height="12" fill="#2C3E50"/>
+          <circle cx="97" cy="113" r="1.5" fill="#333"/>
+          <circle cx="103" cy="113" r="1.5" fill="#333"/>
+          <path d="M96,118 Q100,121 104,118" stroke="#333" fill="none" stroke-width="0.8"/>
+        </g>
+        <g id="child-2" class="child-figure">
+          <circle cx="140" cy="112" r="10" fill="#FFD1A4"/>
+          <rect x="132" y="122" width="16" height="28" fill="#3498DB" rx="2"/>
+          <rect x="132" y="150" width="7" height="12" fill="#2C3E50"/>
+          <rect x="141" y="150" width="7" height="12" fill="#2C3E50"/>
+          <circle cx="137" cy="110" r="1.5" fill="#333"/>
+          <circle cx="143" cy="110" r="1.5" fill="#333"/>
+          <path d="M136,115 Q140,118 144,115" stroke="#333" fill="none" stroke-width="0.8"/>
+        </g>
+        <g id="child-sam" class="child-figure">
+          <circle cx="180" cy="110" r="11" fill="#FFD1A4"/>
+          <rect x="171" y="121" width="18" height="29" fill="#FF6B35" rx="2"/>
+          <rect x="171" y="150" width="8" height="13" fill="#2C3E50"/>
+          <rect x="181" y="150" width="8" height="13" fill="#2C3E50"/>
+          <circle cx="176" cy="108" r="1.8" fill="#333"/>
+          <circle cx="184" cy="108" r="1.8" fill="#333"/>
+          <path d="M175,113 Q180,117 185,113" stroke="#333" fill="none" stroke-width="1"/>
+          <!-- Hair -->
+          <path d="M169,107 Q175,95 191,107" fill="#2C1810" stroke="none"/>
+        </g>
+        <g id="child-4" class="child-figure">
+          <circle cx="220" cy="114" r="10" fill="#FFD1A4"/>
+          <rect x="212" y="124" width="16" height="26" fill="#9B59B6" rx="2"/>
+          <rect x="212" y="150" width="7" height="12" fill="#2C3E50"/>
+          <rect x="221" y="150" width="7" height="12" fill="#2C3E50"/>
+          <circle cx="217" cy="112" r="1.5" fill="#333"/>
+          <circle cx="223" cy="112" r="1.5" fill="#333"/>
+          <path d="M216,117 Q220,120 224,117" stroke="#333" fill="none" stroke-width="0.8"/>
+        </g>
+        <g id="child-5" class="child-figure">
+          <circle cx="258" cy="116" r="10" fill="#FFD1A4"/>
+          <rect x="250" y="126" width="16" height="24" fill="#1ABC9C" rx="2"/>
+          <rect x="250" y="150" width="7" height="12" fill="#2C3E50"/>
+          <rect x="259" y="150" width="7" height="12" fill="#2C3E50"/>
+          <circle cx="255" cy="114" r="1.5" fill="#333"/>
+          <circle cx="261" cy="114" r="1.5" fill="#333"/>
+          <path d="M254,119 Q258,122 262,119" stroke="#333" fill="none" stroke-width="0.8"/>
+        </g>
+      </svg>
+      <div class="glitch-line"></div>
+      <div class="corruption-overlay" id="corruption-overlay"></div>
+      <div class="corruption-text" id="corruption-text"></div>
+    </div>
+    <div class="photo-caption" id="photo-caption">Sam & Friends — Class of '99</div>
+  </div>
+</section>
+
+<!-- ================================================================
+     STATUS OVERLAY
+     ================================================================ -->
+<div class="status-overlay hidden" id="status-overlay">
+  <div class="status-card" id="status-card">
+    <div class="status-icon" id="status-icon"></div>
+    <div class="status-title" id="status-title"></div>
+    <div class="status-subtitle" id="status-subtitle"></div>
+    <button class="btn-warm" id="status-btn" style="font-size:0.75rem; padding:10px 25px;">CONTINUE</button>
+  </div>
+</div>
+
+<!-- NOTEBOOK POPUP (hidden by default) -->
+<div class="notebook-popup-overlay hidden" id="notebook-overlay"></div>
+<div class="notebook-popup hidden" id="notebook-popup">
+  <button class="notebook-popup-close" id="notebook-close">✕</button>
+  <div class="notebook-popup-text">
+    "To move forward, focus on the <u>present</u>, not the future."
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   PROJECT REWIND — MEMORY RECONSTRUCTION ENGINE
+   ================================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ==============================================
+  // CONFIGURATION — EASILY REPLACEABLE
+  // ==============================================
+
+  const CHILDHOOD_OBJECTS = [
+    { id: "cricket-bat", name: "Cricket Bat", emoji: "🏏", desc: "A worn willow bat, edges taped with white electrical tape." },
+    { id: "tennis-ball", name: "Tennis Ball", emoji: "🎾", desc: "Slightly deflated, worn from countless gully cricket matches." },
+    { id: "pokemon-cards", name: "Pokémon Cards", emoji: "🃏", desc: "A prized collection with a holographic Charizard on top." },
+    { id: "beyblade", name: "Beyblade", emoji: "🌀", desc: "Battle-scarred spinning top, attack ring chipped from victories." },
+    { id: "tazos", name: "Tazos", emoji: "⭕", desc: "Colourful disc collectibles from chip packets." },
+    { id: "comic-book", name: "Comic Book", emoji: "📖", desc: "A dog-eared Tinkle magazine with stories circled in pencil." },
+    { id: "toy-car", name: "Toy Car", emoji: "🚗", desc: "A tiny red Hot Wheels car with one missing wheel." },
+    { id: "marbles", name: "Marbles", emoji: "🔮", desc: "A cloth pouch full of glass marbles with swirling colours." },
+    { id: "pencil-box", name: "Pencil Box", emoji: "✏️", desc: "A magnetic pencil box covered in cartoon stickers." },
+    { id: "school-badge", name: "School Badge", emoji: "🎖️", desc: "A metal pin badge with the school crest, slightly rusted." },
+    { id: "birthday-invite", name: "Birthday Invitation", emoji: "🎂", desc: "A handmade card with glitter glue and crayon drawings." },
+    { id: "sticker-sheet", name: "Sticker Sheet", emoji: "🌟", desc: "Half-used sheet of Powerpuff Girls and Dexter stickers." },
+    { id: "water-bottle", name: "Water Bottle", emoji: "🧴", desc: "A dented Milton steel bottle with a faded name label." },
+    { id: "game-cd", name: "Video Game CD", emoji: "💿", desc: "A scratched CD case labeled 'Road Rash' in marker pen." },
+    { id: "old-photo", name: "Old Photograph", emoji: "📷", desc: "A faded polaroid of friends posing in school uniforms." }
+  ];
+
+  const MODERN_OBJECTS = [
+    { name: "Laptop", emoji: "💻" },
+    { name: "Smartphone", emoji: "📱" },
+    { name: "Office ID Card", emoji: "🪪" },
+    { name: "Car Keys", emoji: "🔑" },
+    { name: "Credit Card", emoji: "💳" },
+    { name: "Wireless Earbuds", emoji: "🎧" },
+    { name: "Briefcase", emoji: "💼" },
+    { name: "Smartwatch", emoji: "⌚" }
+  ];
+
+  // RIDDLES — order determines correct reconstruction sequence
+  const RIDDLES = [
+    {
+      text: "Every morning, I waited on your desk — holding your colours, your sharpener, and your tiny eraser, all in one place.",
+      answer: "pencil-box"
+    },
+    {
+      text: "During boring lectures, I secretly travelled from desk to desk, racing without making a sound.",
+      answer: "toy-car"
+    },
+    {
+      text: "Between colourful pages, I carried you to distant lands and impossible adventures.",
+      answer: "comic-book"
+    },
+    {
+      text: "After the final bell rang, friends gathered in circles to collect, trade, and battle with me.",
+      answer: "pokemon-cards"
+    },
+    {
+      text: "As the evening sun dipped low, I spun through fierce battles without ever moving my feet.",
+      answer: "beyblade"
+    }
+  ];
+
+  // Which box is "correct" (childhood) and which is "wrong" (modern)
+  // Randomized each session
+  const correctBoxId = Math.random() > 0.5 ? 'A' : 'B';
+
+  // ==============================================
+  // STATE
+  // ==============================================
+  const state = {
+    phase: 'intro',
+    riddleIndex: 0,
+    solvedRiddles: [],
+    boardSlots: [null, null, null, null, null],
+    restorationLevel: 0
+  };
+
+  // ==============================================
+  // DOM CACHE
+  // ==============================================
+  const $ = id => document.getElementById(id);
+
+  const phases = {
+    intro: $('phase-intro'),
+    room: $('phase-room'),
+    wrongBox: $('phase-wrong-box'),
+    objects: $('phase-objects'),
+    riddles: $('phase-riddles'),
+    dragdrop: $('phase-dragdrop'),
+    final: $('phase-final')
+  };
+
+  // ==============================================
+  // AUDIO ENGINE (Web Audio API)
+  // ==============================================
+  let audioCtx = null;
+
+  function ensureAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  }
+
+  function playTone(freq = 600, dur = 0.12, type = 'sine', vol = 0.06) {
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      g.gain.setValueAtTime(vol, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+      osc.connect(g);
+      g.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur);
+    } catch(e) {}
+  }
+
+  function playChime() {
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+      setTimeout(() => playTone(f, 0.25, 'triangle', 0.05), i * 100);
+    });
+  }
+
+  function playError() {
+    playTone(220, 0.3, 'sawtooth', 0.04);
+  }
+
+  function playSuccess() {
+    [392, 523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+      setTimeout(() => playTone(f, 0.3, 'triangle', 0.05), i * 120);
+    });
+  }
+
+  // ==============================================
+  // PARTICLE SYSTEM (Warm Ambient)
+  // ==============================================
+  const pCanvas = $('particles-canvas');
+  const pCtx = pCanvas.getContext('2d');
+  let mParticles = [];
+
+  function resizeParticleCanvas() {
+    pCanvas.width = window.innerWidth;
+    pCanvas.height = window.innerHeight;
+  }
+
+  resizeParticleCanvas();
+  window.addEventListener('resize', resizeParticleCanvas);
+
+  class WarmParticle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * pCanvas.width;
+      this.y = Math.random() * pCanvas.height;
+      this.vx = (Math.random() - 0.5) * 0.3;
+      this.vy = (Math.random() - 0.5) * 0.3;
+      this.r = Math.random() * 2.5 + 1;
+      this.alpha = Math.random() * 0.3 + 0.05;
+      const hue = 30 + Math.random() * 25;
+      this.color = `hsla(${hue}, 80%, 65%, ${this.alpha})`;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < 0 || this.x > pCanvas.width) this.vx *= -1;
+      if (this.y < 0 || this.y > pCanvas.height) this.vy *= -1;
+    }
+    draw() {
+      pCtx.beginPath();
+      pCtx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      pCtx.fillStyle = this.color;
+      pCtx.fill();
+    }
+  }
+
+  for (let i = 0; i < 40; i++) mParticles.push(new WarmParticle());
+
+  function animateParticles() {
+    pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+    mParticles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+
+  // Burst particles at position
+  function burstParticles(x, y, count = 15) {
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      el.className = 'memory-particle';
+      const hue = 30 + Math.random() * 30;
+      el.style.background = `hsl(${hue}, 80%, 65%)`;
+      el.style.boxShadow = `0 0 6px hsl(${hue}, 80%, 65%)`;
+      el.style.left = (x + (Math.random() - 0.5) * 80) + 'px';
+      el.style.top = (y + Math.random() * 40) + 'px';
+      el.style.animationDuration = (1.5 + Math.random()) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }
+  }
+
+  // ==============================================
+  // FAIRY LIGHTS GENERATION
+  // ==============================================
+  const fairyContainer = $('fairy-lights');
+  const lightColors = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#ff6b6b', '#ffd93d', '#ff9ff3', '#00d2d3', '#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff'];
+  lightColors.forEach((c, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'fairy-light';
+    dot.style.color = c;
+    dot.style.background = c;
+    dot.style.animationDelay = (i * 0.2) + 's';
+    fairyContainer.appendChild(dot);
+  });
+
+  // ==============================================
+  // PHASE TRANSITIONS
+  // ==============================================
+  function showPhase(name) {
+    const current = phases[state.phase];
+    if (current) {
+      current.classList.add('fade-out');
+      setTimeout(() => {
+        current.classList.add('hidden');
+        current.classList.remove('fade-out');
+      }, 800);
+    }
+    setTimeout(() => {
+      phases[name].classList.remove('hidden');
+      state.phase = name;
+    }, current ? 800 : 0);
+  }
+
+  // ==============================================
+  // INTRO
+  // ==============================================
+  $('btn-start').addEventListener('click', () => {
+    ensureAudio();
+    playTone(800, 0.12);
+    showPhase('room');
+  });
+
+  // ==============================================
+  // ROOM INTERACTIONS
+  // ==============================================
+
+  // Notebook clue popup
+  $('notebook-clue').addEventListener('click', () => {
+    playTone(600, 0.08);
+    $('notebook-popup').classList.remove('hidden');
+    $('notebook-overlay').classList.remove('hidden');
+  });
+
+  $('notebook-close').addEventListener('click', closeNotebook);
+  $('notebook-overlay').addEventListener('click', closeNotebook);
+
+  function closeNotebook() {
+    $('notebook-popup').classList.add('hidden');
+    $('notebook-overlay').classList.add('hidden');
+  }
+
+  // Box clicks
+  $('box-a').addEventListener('click', () => handleBoxClick('A'));
+  $('box-b').addEventListener('click', () => handleBoxClick('B'));
+
+  function handleBoxClick(boxId) {
+    playTone(700, 0.1);
+    closeNotebook();
+
+    if (boxId === correctBoxId) {
+      // Correct box — childhood items
+      setTimeout(() => {
+        showPhase('objects');
+        renderObjectsGallery();
+        burstParticles(window.innerWidth / 2, window.innerHeight / 2, 25);
+        playChime();
+      }, 200);
+    } else {
+      // Wrong box — modern items
+      setTimeout(() => {
+        showPhase('wrongBox');
+        renderWrongItems();
+        playError();
+      }, 200);
+    }
+  }
+
+  // ==============================================
+  // WRONG BOX
+  // ==============================================
+  function renderWrongItems() {
+    const grid = $('wrong-items-grid');
+    grid.innerHTML = '';
+    MODERN_OBJECTS.forEach((obj, i) => {
+      const el = document.createElement('div');
+      el.className = 'wrong-item';
+      el.style.animationDelay = (i * 0.1) + 's';
+      el.innerHTML = `<div class="wrong-item-emoji">${obj.emoji}</div><div class="wrong-item-name">${obj.name}</div>`;
+      grid.appendChild(el);
+    });
+  }
+
+  $('btn-try-again').addEventListener('click', () => {
+    playTone(500, 0.06);
+    showPhase('room');
+  });
+
+  // ==============================================
+  // OBJECTS GALLERY
+  // ==============================================
+  function renderObjectsGallery() {
+    const grid = $('objects-grid');
+    grid.innerHTML = '';
+    CHILDHOOD_OBJECTS.forEach((obj, i) => {
+      const card = document.createElement('div');
+      card.className = 'object-card';
+      card.dataset.id = obj.id;
+      card.style.animationDelay = (i * 0.06) + 's';
+      card.innerHTML = `
+        <span class="object-emoji">${obj.emoji}</span>
+        <div class="object-name">${obj.name}</div>
+        <div class="object-desc">${obj.desc}</div>
+      `;
+      card.addEventListener('click', () => {
+        playTone(800 + Math.random() * 200, 0.08, 'triangle');
+        burstParticles(card.getBoundingClientRect().left + 50, card.getBoundingClientRect().top + 30, 6);
+      });
+      grid.appendChild(card);
+    });
+
+    // Show continue button after a delay
+    setTimeout(() => {
+      $('btn-to-riddles').classList.remove('hidden');
+    }, 2000);
+  }
+
+  $('btn-to-riddles').addEventListener('click', () => {
+    playTone(700, 0.1);
+    state.riddleIndex = 0;
+    state.solvedRiddles = [];
+    showPhase('riddles');
+    setTimeout(() => {
+      renderRiddlePhase();
+    }, 900);
+  });
+
+  // ==============================================
+  // RIDDLE PHASE
+  // ==============================================
+  function renderRiddlePhase() {
+    const riddle = RIDDLES[state.riddleIndex];
+    $('riddle-progress').textContent = `RIDDLE ${state.riddleIndex + 1} / ${RIDDLES.length}`;
+    $('riddle-text').textContent = `"${riddle.text}"`;
+
+    // Render all objects as clickable
+    const grid = $('riddle-objects-grid');
+    grid.innerHTML = '';
+
+    CHILDHOOD_OBJECTS.forEach((obj, i) => {
+      const card = document.createElement('div');
+      card.className = 'object-card';
+      card.dataset.id = obj.id;
+      card.style.animationDelay = (i * 0.04) + 's';
+
+      // If already solved, show as selected
+      if (state.solvedRiddles.includes(obj.id)) {
+        card.classList.add('selected');
+        card.style.opacity = '0.5';
+        card.style.pointerEvents = 'none';
+      }
+
+      card.innerHTML = `
+        <span class="object-emoji">${obj.emoji}</span>
+        <div class="object-name">${obj.name}</div>
+      `;
+
+      card.addEventListener('click', () => handleRiddleAnswer(obj.id, card));
+      grid.appendChild(card);
+    });
+  }
+
+  function handleRiddleAnswer(objectId, cardEl) {
+    const riddle = RIDDLES[state.riddleIndex];
+
+    if (objectId === riddle.answer) {
+      // Correct!
+      playChime();
+      cardEl.classList.add('selected');
+      state.solvedRiddles.push(objectId);
+      burstParticles(cardEl.getBoundingClientRect().left + 50, cardEl.getBoundingClientRect().top + 30, 12);
+
+      // Increase restoration
+      state.restorationLevel += 10;
+      updateRestoration();
+
+      setTimeout(() => {
+        state.riddleIndex++;
+        if (state.riddleIndex >= RIDDLES.length) {
+          // All riddles solved — move to drag & drop
+          showStatus('success', '✨', 'ALL RIDDLES SOLVED', 'Now arrange the memories in the correct order.', () => {
+            showPhase('dragdrop');
+            setTimeout(renderDragDropPhase, 900);
+          });
+        } else {
+          renderRiddlePhase();
+        }
+      }, 800);
+    } else {
+      // Wrong
+      playError();
+      cardEl.classList.add('wrong-select');
+      setTimeout(() => cardEl.classList.remove('wrong-select'), 600);
+    }
+  }
+
+  // ==============================================
+  // RESTORATION EFFECTS
+  // ==============================================
+  function updateRestoration() {
+    const v = $('vignette-warm');
+    v.style.opacity = Math.min(state.restorationLevel / 100, 0.6);
+    $('lbl-integrity').textContent = Math.min(38 + state.restorationLevel, 98) + '%';
+  }
+
+  // ==============================================
+  // STATUS OVERLAY
+  // ==============================================
+  function showStatus(type, icon, title, subtitle, callback) {
+    const overlay = $('status-overlay');
+    const card = $('status-card');
+    card.className = `status-card ${type}`;
+    $('status-icon').textContent = icon;
+    $('status-title').textContent = title;
+    $('status-subtitle').textContent = subtitle;
+    overlay.classList.remove('hidden');
+
+    const btn = $('status-btn');
+    btn.onclick = () => {
+      overlay.classList.add('hidden');
+      if (callback) callback();
+    };
+  }
+
+  // ==============================================
+  // DRAG & DROP PHASE
+  // ==============================================
+  let dragState = { active: false, objectId: null, element: null, clone: null };
+
+  function renderDragDropPhase() {
+    state.boardSlots = [null, null, null, null, null];
+
+    // Render drop slots
+    const board = $('reconstruction-board');
+    board.innerHTML = '';
+    for (let i = 0; i < 5; i++) {
+      const slot = document.createElement('div');
+      slot.className = 'drop-slot';
+      slot.dataset.index = i;
+      slot.innerHTML = `<div class="slot-number">${i + 1}</div><div class="slot-label">DROP HERE</div>`;
+      board.appendChild(slot);
+    }
+
+    // Render draggable objects (shuffled)
+    const container = $('draggable-objects');
+    container.innerHTML = '';
+    const shuffled = [...state.solvedRiddles].sort(() => Math.random() - 0.5);
+    shuffled.forEach(id => {
+      const obj = CHILDHOOD_OBJECTS.find(o => o.id === id);
+      const el = document.createElement('div');
+      el.className = 'draggable-item';
+      el.dataset.id = obj.id;
+      el.innerHTML = `<span class="object-emoji">${obj.emoji}</span><div class="object-name">${obj.name}</div>`;
+      initDrag(el, obj);
+      container.appendChild(el);
+    });
+
+    $('btn-verify').classList.add('hidden');
+  }
+
+  function initDrag(element, obj) {
+    element.addEventListener('mousedown', (e) => { e.preventDefault(); startDrag(e, obj, element); });
+    element.addEventListener('touchstart', (e) => { startDrag(e, obj, element); }, { passive: false });
+  }
+
+  function startDrag(e, obj, element) {
+    e.preventDefault();
+    const pt = getPoint(e);
+
+    // Create clone
+    const clone = document.createElement('div');
+    clone.className = 'drag-clone';
+    clone.innerHTML = `<span class="object-emoji">${obj.emoji}</span><div class="object-name">${obj.name}</div>`;
+    clone.style.left = pt.x + 'px';
+    clone.style.top = pt.y + 'px';
+    document.body.appendChild(clone);
+
+    element.classList.add('dragging');
+
+    dragState = { active: true, objectId: obj.id, element, clone };
+
+    document.addEventListener('mousemove', onDragMove);
+    document.addEventListener('mouseup', onDragEnd);
+    document.addEventListener('touchmove', onDragMove, { passive: false });
+    document.addEventListener('touchend', onDragEnd);
+
+    playTone(600, 0.05);
+  }
+
+  function onDragMove(e) {
+    if (!dragState.active) return;
+    e.preventDefault();
+    const pt = getPoint(e);
+    dragState.clone.style.left = pt.x + 'px';
+    dragState.clone.style.top = pt.y + 'px';
+
+    // Highlight drop zones
+    document.querySelectorAll('.drop-slot').forEach(slot => {
+      const r = slot.getBoundingClientRect();
+      const over = pt.x > r.left && pt.x < r.right && pt.y > r.top && pt.y < r.bottom;
+      slot.classList.toggle('drag-over', over && !state.boardSlots[slot.dataset.index]);
+    });
+  }
+
+  function onDragEnd(e) {
+    if (!dragState.active) return;
+    const pt = getPoint(e.changedTouches ? e : e);
+
+    let placed = false;
+    document.querySelectorAll('.drop-slot').forEach(slot => {
+      slot.classList.remove('drag-over');
+      const r = slot.getBoundingClientRect();
+      const idx = parseInt(slot.dataset.index);
+      const over = pt.x > r.left && pt.x < r.right && pt.y > r.top && pt.y < r.bottom;
+
+      if (over && !state.boardSlots[idx]) {
+        // Place it
+        state.boardSlots[idx] = dragState.objectId;
+        const obj = CHILDHOOD_OBJECTS.find(o => o.id === dragState.objectId);
+        slot.innerHTML = `<div class="slot-placed-emoji">${obj.emoji}</div><div class="slot-placed-name">${obj.name}</div>`;
+        slot.classList.add('filled');
+        dragState.element.style.display = 'none';
+        placed = true;
+        playTone(800, 0.1, 'triangle');
+
+        // Restoration effect
+        state.restorationLevel += 5;
+        updateRestoration();
+        burstParticles(r.left + r.width/2, r.top, 8);
+      }
+    });
+
+    if (!placed) {
+      dragState.element.classList.remove('dragging');
+    }
+
+    dragState.clone.remove();
+    dragState = { active: false };
+
+    document.removeEventListener('mousemove', onDragMove);
+    document.removeEventListener('mouseup', onDragEnd);
+    document.removeEventListener('touchmove', onDragMove);
+    document.removeEventListener('touchend', onDragEnd);
+
+    // Check if all slots filled
+    if (state.boardSlots.every(s => s !== null)) {
+      setTimeout(() => $('btn-verify').classList.remove('hidden'), 400);
+    }
+  }
+
+  function getPoint(e) {
+    if (e.changedTouches && e.changedTouches.length) {
+      return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    }
+    if (e.touches && e.touches.length) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  }
+
+  // VERIFY SEQUENCE
+  $('btn-verify').addEventListener('click', () => {
+    const correctOrder = RIDDLES.map(r => r.answer);
+    const isCorrect = state.boardSlots.every((id, i) => id === correctOrder[i]);
+
+    if (isCorrect) {
+      playSuccess();
+      state.restorationLevel = 80;
+      updateRestoration();
+
+      // Flash all slots green
+      document.querySelectorAll('.drop-slot').forEach(s => {
+        s.classList.add('filled');
+        s.classList.remove('wrong-order');
+      });
+
+      showStatus('success', '🌟', 'MEMORY RECONSTRUCTION SUCCESSFUL', 'The memory fragments are aligning...', () => {
+        showPhase('final');
+        setTimeout(startFinalSequence, 1000);
+      });
+    } else {
+      playError();
+
+      // Highlight wrong positions
+      document.querySelectorAll('.drop-slot').forEach((slot, i) => {
+        if (state.boardSlots[i] !== correctOrder[i]) {
+          slot.classList.add('wrong-order');
+        }
+      });
+
+      showStatus('failure', '⚠️', 'MEMORY RECONSTRUCTION FAILED', 'The sequence is incorrect. Rearrange and try again.', () => {
+        // Reset board
+        renderDragDropPhase();
+      });
+    }
+  });
+
+  // ==============================================
+  // FINAL PHOTO SEQUENCE
+  // ==============================================
+  function startFinalSequence() {
+    const fill = $('restoration-fill');
+    const frame = $('photo-frame');
+    const label = $('final-label');
+    const corruption = $('corruption-overlay');
+    const corruptText = $('corruption-text');
+    const caption = $('photo-caption');
+
+    // Step 1: Restoration bar fills
+    frame.style.opacity = '0';
+    frame.style.transform = 'scale(0.9)';
+
+    setTimeout(() => { fill.style.width = '40%'; label.textContent = 'RESTORING MEMORY FRAGMENTS...'; }, 500);
+    setTimeout(() => { fill.style.width = '70%'; }, 1500);
+    setTimeout(() => {
+      fill.style.width = '100%';
+      label.textContent = 'MEMORY RESTORED';
+      state.restorationLevel = 100;
+      updateRestoration();
+    }, 2500);
+
+    // Step 2: Photo appears
+    setTimeout(() => {
+      frame.style.transition = 'all 1.5s ease';
+      frame.style.opacity = '1';
+      frame.style.transform = 'scale(1)';
+      playChime();
+      burstParticles(window.innerWidth / 2, window.innerHeight / 2 - 50, 30);
+    }, 3500);
+
+    // Step 3: Normal viewing (4 seconds)
+    // Step 4: First flicker on Sam's figure
+    setTimeout(() => {
+      const sam = document.getElementById('child-sam');
+      if (sam) {
+        sam.style.transition = 'opacity 0.1s';
+        sam.style.opacity = '0.3';
+        setTimeout(() => { sam.style.opacity = '1'; }, 150);
+        setTimeout(() => { sam.style.opacity = '0.4'; }, 400);
+        setTimeout(() => { sam.style.opacity = '1'; }, 550);
+      }
+      playTone(220, 0.2, 'sawtooth', 0.03);
+    }, 8000);
+
+    // Step 5: Stronger glitch
+    setTimeout(() => {
+      frame.classList.add('glitching');
+      playTone(180, 0.4, 'sawtooth', 0.04);
+
+      const sam = document.getElementById('child-sam');
+      if (sam) {
+        sam.style.opacity = '0.2';
+        sam.style.filter = 'hue-rotate(180deg) saturate(3)';
+      }
+    }, 10000);
+
+    // Step 6: Corruption spreads
+    setTimeout(() => {
+      corruption.style.opacity = '0.8';
+      label.textContent = '';
+      label.style.color = '#ff3366';
+    }, 11000);
+
+    // Step 7: MEMORY INTEGRITY UNSTABLE
+    setTimeout(() => {
+      corruptText.style.opacity = '1';
+      corruptText.innerHTML = 'MEMORY INTEGRITY UNSTABLE';
+      playTone(150, 0.5, 'sawtooth', 0.05);
+    }, 11500);
+
+    // Step 8: FILE CORRUPTED
+    setTimeout(() => {
+      corruptText.innerHTML = 'MEMORY INTEGRITY UNSTABLE<br>FILE CORRUPTED';
+    }, 13000);
+
+    // Step 9: Photo dissolves
+    setTimeout(() => {
+      frame.classList.remove('glitching');
+      frame.style.transition = 'all 1.5s ease';
+      frame.style.opacity = '0';
+      frame.style.transform = 'scale(0.8)';
+      caption.style.opacity = '0';
+      corruptText.style.opacity = '0';
+      corruption.style.opacity = '0';
+      label.textContent = 'Memory fragment saved... but incomplete.';
+      label.style.color = 'rgba(255,248,231,0.4)';
+
+      $('vignette-warm').style.opacity = '0';
+    }, 14500);
+
+    // Step 10: Darkness
+    setTimeout(() => {
+      fill.style.width = '62%';
+      fill.style.background = 'linear-gradient(90deg, var(--evening-gold), var(--error))';
+      label.textContent = '// END OF MEMORY RECONSTRUCTION — PHASE 1';
+      label.style.fontFamily = 'var(--font-mono)';
+      label.style.fontSize = '0.7rem';
+      label.style.letterSpacing = '2px';
+    }, 17000);
+  }
+
+});
+</script>
+</body>
+</html>

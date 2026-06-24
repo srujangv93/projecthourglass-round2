@@ -1,0 +1,265 @@
+@import "tailwindcss";
+
+@theme {
+  --color-archive-black: #1A1A1A;
+  --color-archive-amber: #D4A870;
+  --color-archive-green: #8CFF8C;
+  --color-archive-white: #FFFFFF;
+  --color-archive-cream: #F5E6D3;
+  --color-archive-blue: #4A90E2;
+  --color-archive-brown: #3E2723;
+  --color-archive-aged-blue: #5C7C99;
+  
+  /* Compatibility with existing code */
+  --color-primary: #D4A870;
+  --color-accent: #5C7C99;
+  --color-error: #B71C1C;
+  --color-success: #2E7D32;
+  
+  --font-mono: var(--font-jetbrains-mono), 'Courier New', Courier, monospace;
+}
+
+:root {
+  --background: #1A1A1A;
+  --foreground: #F5E6D3;
+  --archive-amber: #D4A870;
+  --archive-green: #8CFF8C;
+  --archive-cream: #F5E6D3;
+  --archive-blue: #5C7C99;
+  --archive-brown: #3E2723;
+  --win-xp-blue: #3A6EA5;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Tahoma', 'Verdana', sans-serif;
+  overflow-x: hidden;
+  background-image: url("/nostalgic-bg.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  filter: sepia(0.2) contrast(1.1) brightness(0.85); /* Stronger vintage look */
+}
+
+/* CRT Startup Effect */
+@keyframes crt-startup {
+  0% { transform: scaleY(0.005) scaleX(0); opacity: 0; }
+  2% { transform: scaleY(0.005) scaleX(1); opacity: 1; }
+  70% { transform: scaleY(1) scaleX(1); opacity: 1; }
+  100% { transform: scaleY(1) scaleX(1); opacity: 1; }
+}
+
+.crt-startup {
+  animation: crt-startup 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.97; }
+  5% { opacity: 0.95; }
+  10% { opacity: 0.97; }
+  15% { opacity: 0.94; }
+  20% { opacity: 0.98; }
+  25% { opacity: 0.95; }
+  30% { opacity: 0.97; }
+  100% { opacity: 0.98; }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+  40% { transform: translate(-2px, -2px); filter: hue-rotate(180deg); }
+  60% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
+  80% { transform: translate(2px, -2px); filter: hue-rotate(360deg); }
+  100% { transform: translate(0); }
+}
+
+@keyframes vhs-tracking {
+  0% { transform: translateY(0) skewX(0deg); }
+  1% { transform: translateY(2px) skewX(1deg); }
+  2% { transform: translateY(-1px) skewX(-1deg); }
+  3% { transform: translateY(0) skewX(0deg); }
+}
+
+.crt-overlay::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%),
+    linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+  background-size: 100% 3px, 3px 100%;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.5;
+  animation: flicker 0.15s infinite;
+}
+
+.vhs-scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.05), transparent);
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 1000;
+  animation: scanline 6s linear infinite, vhs-tracking 10s steps(10) infinite;
+}
+
+/* Chrome/Noise Overlay */
+.noise::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url("https://www.transparenttextures.com/patterns/stardust.png");
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 998;
+}
+
+/* 2007 Glossy Button Style - Warm & Aged */
+.glossy-button {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.2) 100%);
+  border: 1px solid rgba(62, 39, 35, 0.5);
+  box-shadow: 
+    inset 0 1px 1px rgba(255,255,255,0.4), 
+    0 2px 4px rgba(0,0,0,0.3),
+    0 0 0 1px rgba(255,255,255,0.1);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+  transition: all 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+
+.glossy-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+  pointer-events: none;
+}
+
+.glossy-button:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* Win XP Style Window Bevel - Aged */
+.win-bevel {
+  border: 2px solid;
+  border-color: #F5E6D3 #5D4037 #3E2723 #F5E6D3;
+  background: #D7CCC8;
+  box-shadow: 
+    4px 4px 0px rgba(0,0,0,0.2),
+    inset 1px 1px 0px rgba(255,255,255,0.3);
+}
+
+/* Custom Scrollbar - XP Style */
+::-webkit-scrollbar {
+  width: 16px;
+}
+
+::-webkit-scrollbar-track {
+  background: #d4d0c8;
+  border: 1px solid #808080;
+  background-image: linear-gradient(90deg, #dfdfdf 1px, transparent 1px), linear-gradient(#dfdfdf 1px, transparent 1px);
+  background-size: 2px 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d4d0c8;
+  border: 2px solid;
+  border-color: #ffffff #808080 #808080 #ffffff;
+  box-shadow: inset 1px 1px 0px #eee;
+}
+
+::-webkit-scrollbar-button {
+  background: #d4d0c8;
+  border: 1px solid #808080;
+  width: 16px;
+  height: 16px;
+}
+
+/* Typography Overrides */
+h1, h2, h3 {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.pixel-text {
+  font-family: 'Courier New', Courier, monospace;
+  image-rendering: pixelated;
+  letter-spacing: 0.05em;
+}
+
+/* Aged Paper & Textures */
+.paper-texture {
+  background-color: #f4ecd8;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(0,0,0,0.02) 0%, transparent 100%),
+    url("https://www.transparenttextures.com/patterns/natural-paper.png");
+  position: relative;
+}
+
+.paper-texture::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("https://www.transparenttextures.com/patterns/pinstripe-dark.png");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+.worn-edge {
+  mask-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png");
+}
+
+.sepia-heavy {
+  filter: sepia(0.5) contrast(1.2) brightness(0.9) saturate(0.8);
+}
+
+.vignette {
+  box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
+}
+
+/* Folder Style Tab */
+.folder-tab {
+  background: #D7CCC8;
+  border-top: 2px solid #F5E6D3;
+  border-left: 2px solid #F5E6D3;
+  border-right: 2px solid #5D4037;
+  clip-path: polygon(0% 0%, 85% 0%, 100% 100%, 0% 100%);
+}
+
+.border-error {
+  border-color: #E60000;
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 1s infinite;
+}

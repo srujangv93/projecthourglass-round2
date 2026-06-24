@@ -1,0 +1,63 @@
+{
+  "teams": [
+    {
+      "name": "df",
+      "teamId": "0_zywvq_",
+      "startTime": "2026-06-09T12:25:56.843Z",
+      "solvedPuzzleIds": [],
+      "attempts": 0,
+      "score": 0,
+      "isCompleted": false,
+      "collectedLetters": [],
+      "finalWordSolved": false
+    },
+    {
+      "name": "hg",
+      "teamId": "y0xhfiig",
+      "startTime": "2026-06-09T12:26:50.951Z",
+      "solvedPuzzleIds": [],
+      "attempts": 0,
+      "score": 0,
+      "isCompleted": false,
+      "collectedLetters": [],
+      "finalWordSolved": false
+    },
+    {
+      "name": "df",
+      "teamId": "t_9lkmrf",
+      "startTime": "2026-06-09T12:29:18.474Z",
+      "solvedPuzzleIds": [],
+      "attempts": 5,
+      "score": 0,
+      "isCompleted": false,
+      "collectedLetters": [],
+      "finalWordSolved": false
+    },
+    {
+      "name": "a",
+      "teamId": "gusyvw8u",
+      "startTime": "2026-06-09T12:32:48.493Z",
+      "solvedPuzzleIds": [
+        "1lbqw70gn58"
+      ],
+      "attempts": 0,
+      "score": 0,
+      "isCompleted": false,
+      "collectedLetters": [
+        "M"
+      ],
+      "finalWordSolved": false
+    }
+  ],
+  "puzzles": [],
+  "settings": {
+    "attemptsPerPuzzle": 10,
+    "timeLimit": 300,
+    "completionCodePrefix": "MEMORY",
+    "adminPasswordHash": "",
+    "themeColor": "#00E5FF",
+    "targetWord": "remisince",
+    "masterAudioUrl": "none",
+    "id": "default"
+  }
+}

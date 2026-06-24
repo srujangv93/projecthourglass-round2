@@ -46,7 +46,22 @@ const planetariumView = document.getElementById('planetarium-view');
 const grainOverlay = document.getElementById('grain-overlay');
 const starfieldBg = document.getElementById('starfield-bg');
 
+let round2StartTime = 0;
+
 btnEnter.addEventListener('click', () => {
+    const teamNameInput = document.getElementById('team-name');
+    const teamNameError = document.getElementById('team-name-error');
+    const teamName = teamNameInput.value.trim();
+    
+    if (!teamName) {
+        teamNameInput.style.borderColor = '#d63031';
+        teamNameError.style.display = 'block';
+        return;
+    }
+    
+    localStorage.setItem('team_name', teamName);
+    round2StartTime = Date.now();
+    
     // 1. Fade out the entry view
     entryView.classList.add('opacity-0');
     
@@ -194,10 +209,22 @@ btnVerifySequence.addEventListener('click', async () => {
     }
     
     try {
+        const timeTaken = round2StartTime > 0 ? Math.floor((Date.now() - round2StartTime) / 1000) : 0;
+        const teamName = localStorage.getItem('team_name') || 'Unknown Team';
+        
+        // We calculate correctness on the frontend to send, but backend will also verify securely
+        const requiredOrder = ['item-mars', 'item-jupiter', 'item-saturn', 'item-polaris', 'item-satellite'];
+        const isCorrect = order.length === 5 && order.every((val, index) => val === requiredOrder[index]);
+
         const res = await fetch('/api/verify-celestial-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ order })
+            body: JSON.stringify({ 
+                teamname: teamName,
+                order: order,
+                iscorrect: isCorrect,
+                timetaken: timeTaken
+            })
         });
         const data = await res.json();
         

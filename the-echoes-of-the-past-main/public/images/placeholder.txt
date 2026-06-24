@@ -1,0 +1,6 @@
+This directory stores nostalgic JPG memory assets for Playground.exe and Classroom.exe:
+- difference1.jpg, difference2.jpg (Spot difference slides)
+- blurred1.jpg, blurred2.jpg (Sunset blurred Recognition items)
+- blackboard.jpg, notebook.jpg, register.jpg, classphoto.jpg (Classroom interactive illustrations)
+
+If these assets are missing, the system uses responsive fallback inline SVGs.

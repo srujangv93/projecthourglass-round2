@@ -1,0 +1,276 @@
+{
+  "puzzles": [
+    {
+      "_id": "puzzle_1",
+      "name": "Segment 1 ",
+      "hint1": "what",
+      "acceptedAnswers": [
+        "Mr Bean",
+        "Mr. Bean",
+        "Bean",
+        "MrBean",
+        "Mister Bean",
+        "mr bean",
+        "mr. bean",
+        "bean",
+        "mrbean",
+        "mister bean"
+      ],
+      "rewardLetter": "M",
+      "audioUrl": "/duolingo.mp3"
+    },
+    {
+      "_id": "puzzle_2",
+      "name": "Segment 2 ",
+      "hint1": "Gamers' favorite chat platform chime (User Join)",
+      "acceptedAnswers": [
+        "Motu Patlu",
+        "MotuPatlu",
+        "Motu",
+        "Patlu",
+        "motu patlu",
+        "motupatlu",
+        "motu",
+        "patlu"
+      ],
+      "rewardLetter": "E",
+      "audioUrl": "/discord.mp3"
+    },
+    {
+      "_id": "puzzle_3",
+      "name": "Segment 3 ",
+      "hint1": "Payment chime at Indian shops",
+      "acceptedAnswers": [
+        "Amul",
+        "Amul Milk",
+        "AmulMilk",
+        "amul",
+        "amul milk",
+        "amulmilk"
+      ],
+      "rewardLetter": "R",
+      "audioUrl": "/paytm.mp3"
+    },
+    {
+      "_id": "puzzle_4",
+      "name": "Segment 4 ",
+      "hint1": "Tudum sound from video streaming",
+      "acceptedAnswers": [
+        "Dairy Milk",
+        "Cadbury Dairy Milk",
+        "Cadbury",
+        "DairyMilk",
+        "Cadbury DairyMilk",
+        "dairy milk",
+        "cadbury dairy milk",
+        "cadbury",
+        "dairymilk",
+        "cadbury dairymilk"
+      ],
+      "rewardLetter": "S",
+      "audioUrl": "/netflix.mp3"
+    },
+    {
+      "_id": "puzzle_5",
+      "name": "Segment 5 ",
+      "hint1": "Queue pop sound from Riot Games shooter",
+      "acceptedAnswers": [
+        "Dheevara",
+        "Dhivara",
+        "Bahubali",
+        "Baahubali",
+        "dheevara",
+        "dhivara",
+        "bahubali",
+        "baahubali"
+      ],
+      "rewardLetter": "E",
+      "audioUrl": "/valorant.mp3"
+    },
+    {
+      "_id": "puzzle_6",
+      "name": "Segment 6 ",
+      "hint1": "Default morning alarm sound on Apple devices",
+      "acceptedAnswers": [
+        "Ben 10",
+        "Ben10",
+        "Ben Ten",
+        "Omnitrix",
+        "ben 10",
+        "ben10",
+        "ben ten",
+        "omnitrix"
+      ],
+      "rewardLetter": "I",
+      "audioUrl": "/iphone.mp3"
+    },
+    {
+      "_id": "puzzle_7",
+      "name": "Segment 7",
+      "hint1": "Imposter game round start sound",
+      "acceptedAnswers": [
+        "Chhota Bheem",
+        "Chota Bheem",
+        "ChhotaBheem",
+        "ChotaBheem",
+        "Bheem",
+        "chhota bheem",
+        "chota bheem",
+        "chhotabheem",
+        "chotabheem",
+        "bheem"
+      ],
+      "rewardLetter": "N",
+      "audioUrl": "/amongus.mp3"
+    },
+    {
+      "_id": "puzzle_8",
+      "name": "Segment 8 ",
+      "hint1": "Logo sound from processor manufacturer",
+      "acceptedAnswers": [
+        "Shinchan",
+        "Shin Chan",
+        "Shin-Chan",
+        "Crayon Shinchan",
+        "shinchan",
+        "shin chan",
+        "shin-chan",
+        "crayon shinchan"
+      ],
+      "rewardLetter": "E",
+      "audioUrl": "/intel.mp3"
+    },
+    {
+      "_id": "puzzle_9",
+      "name": "Segment 9 ",
+      "hint1": "Cute lofi café vibes from NCS (hint: miffy)",
+      "acceptedAnswers": [
+        "Highway",
+        "Highway Movie",
+        "Highway Film",
+        "Patakha Guddi",
+        "highway",
+        "highway movie",
+        "highway film",
+        "patakha guddi"
+      ],
+      "rewardLetter": "C",
+      "audioUrl": "/miffy.mp3"
+    }
+  ],
+  "settings": {
+    "googleFormUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeGtdxtsWq0IC33nvuBUnxrSW7Wp_femr6m0MsitcTSs8qCgw/viewform?usp=publish-editor",
+    "teamIdFieldId": "1210080097",
+    "answerFieldId": "1285742345",
+    "targetWord": "REMINISCE"
+  },
+  "teams": [
+    {
+      "name": "a",
+      "teamId": "-dj3zbil",
+      "startTime": "2026-06-09T16:02:28.113Z",
+      "solvedPuzzleIds": [],
+      "attempts": 0,
+      "collectedLetters": [],
+      "isCompleted": false
+    },
+    {
+      "name": "a",
+      "teamId": "twk5dmxl",
+      "startTime": "2026-06-09T16:03:08.582Z",
+      "solvedPuzzleIds": [],
+      "attempts": 0,
+      "collectedLetters": [],
+      "isCompleted": false
+    },
+    {
+      "name": "a",
+      "teamId": "hvn0fvhp",
+      "startTime": "2026-06-09T16:03:15.963Z",
+      "solvedPuzzleIds": [
+        "puzzle_1",
+        "puzzle_2"
+      ],
+      "attempts": 1,
+      "collectedLetters": [
+        "R",
+        "E"
+      ],
+      "isCompleted": false
+    },
+    {
+      "name": "sg",
+      "teamId": "y4dzhh9u",
+      "startTime": "2026-06-09T16:04:00.257Z",
+      "solvedPuzzleIds": [
+        "puzzle_1",
+        "puzzle_2",
+        "puzzle_3",
+        "puzzle_4",
+        "puzzle_5",
+        "puzzle_6",
+        "puzzle_7"
+      ],
+      "attempts": 0,
+      "collectedLetters": [
+        "R",
+        "E",
+        "M",
+        "I",
+        "N",
+        "I",
+        "S"
+      ],
+      "isCompleted": false
+    },
+    {
+      "name": "b",
+      "teamId": "zvtiax0z",
+      "startTime": "2026-06-09T16:28:11.571Z",
+      "solvedPuzzleIds": [
+        "puzzle_1"
+      ],
+      "attempts": 0,
+      "collectedLetters": [
+        "M"
+      ],
+      "isCompleted": false
+    },
+    {
+      "name": "ab",
+      "teamId": "inhrkoqm",
+      "startTime": "2026-06-10T01:09:47.449Z",
+      "solvedPuzzleIds": [],
+      "attempts": 0,
+      "collectedLetters": [],
+      "isCompleted": false
+    },
+    {
+      "name": "a",
+      "teamId": "vvibdd6u",
+      "startTime": "2026-06-10T01:12:02.584Z",
+      "solvedPuzzleIds": [],
+      "attempts": 0,
+      "collectedLetters": [],
+      "isCompleted": false
+    },
+    {
+      "name": "a",
+      "teamId": "cyuohjqc",
+      "startTime": "2026-06-10T05:59:32.878Z",
+      "solvedPuzzleIds": [],
+      "attempts": 0,
+      "collectedLetters": [],
+      "isCompleted": false
+    },
+    {
+      "name": "ab",
+      "teamId": "g1iydfk6",
+      "startTime": "2026-06-11T01:26:47.588Z",
+      "solvedPuzzleIds": [],
+      "attempts": 0,
+      "collectedLetters": [],
+      "isCompleted": false
+    }
+  ]
+}

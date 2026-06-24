@@ -1,0 +1,3425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Project Rewind Phase 1 — Restore Sam's childhood memory through interactive exploration.">
+  <title>Project Rewind — Memory Reconstruction (Sam's Bedroom)</title>
+  
+  <!-- Retro & Monospace Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ================================================================
+       DESIGN SYSTEM & CSS VARIABLES
+       ================================================================ */
+    :root {
+      --bg-dark: #0f0b07;
+      --wall-base: #f0dac2;
+      --wall-stripe: #e6cbac;
+      --floor-wood: #a67c52;
+      --floor-shadow: #855f38;
+      --wood-dark: #5c3b1e;
+      --wood-light: #ab7f54;
+      --evening-gold: #ffab4c;
+      --evening-warm: #ff6f3c;
+      --evening-glow: rgba(255, 171, 76, 0.25);
+      
+      --cream: #fffaf0;
+      --shadow-color: rgba(15, 11, 7, 0.4);
+      --success: #55efc4;
+      --error: #ff7675;
+      
+      --accent-blue: #00cec9;
+      --accent-purple: #a29bfe;
+      
+      --font-display: 'Orbitron', sans-serif;
+      --font-body: 'Inter', sans-serif;
+      --font-hand: 'Caveat', cursive;
+      --font-mono: 'Share Tech Mono', monospace;
+      
+      --transition-smooth: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* ================================================================
+       RESET & BASE ELEMENTS
+       ================================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-dark);
+      color: #333;
+      min-height: 100vh;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1c150e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 171, 76, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--evening-gold);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Ambient drifting particles background canvas */
+    canvas#particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Evening ambient vignette filter */
+    .vignette-ambient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 40%, rgba(25, 15, 5, 0.45) 100%);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .vignette-warm-pulse {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 30%, rgba(255, 111, 60, 0.08) 100%);
+      pointer-events: none;
+      z-index: 6;
+      opacity: 0;
+      transition: opacity 3s ease;
+    }
+
+    /* ================================================================
+       COMMON UI COMPONENTS & BUTTONS
+       ================================================================ */
+    .btn-warm {
+      background: linear-gradient(135deg, var(--evening-warm), var(--evening-gold));
+      color: #1a0d05;
+      border: none;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 14px 40px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(255, 111, 60, 0.4);
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+      outline: none;
+    }
+    .btn-warm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 35px rgba(255, 111, 60, 0.6);
+      filter: brightness(1.1);
+    }
+    .btn-warm:active {
+      transform: translateY(1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid rgba(255, 171, 76, 0.4);
+      color: var(--evening-gold);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 1.5px;
+      padding: 10px 25px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      outline: none;
+    }
+    .btn-outline:hover {
+      background: rgba(255, 171, 76, 0.15);
+      border-color: var(--evening-gold);
+      box-shadow: 0 0 15px rgba(255, 171, 76, 0.25);
+    }
+
+    /* ================================================================
+       PHASES CONTAINERS
+       ================================================================ */
+    .phase {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .phase.fade-out {
+      opacity: 0;
+      transform: scale(0.97);
+      pointer-events: none;
+    }
+
+    /* ================================================================
+       PHASE 0: INTRO
+       ================================================================ */
+    #phase-intro {
+      background: radial-gradient(circle at center, #24160d 0%, #080503 100%);
+    }
+
+    .intro-card {
+      text-align: center;
+      max-width: 580px;
+      padding: 50px 45px;
+      background: rgba(25, 17, 10, 0.75);
+      border: 1px solid rgba(255, 171, 76, 0.25);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(255, 171, 76, 0.05);
+    }
+
+    .intro-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      color: var(--evening-gold);
+      border: 1px solid rgba(255, 171, 76, 0.3);
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-bottom: 25px;
+      text-shadow: 0 0 8px rgba(255, 171, 76, 0.4);
+    }
+
+    .intro-card h1 {
+      font-family: var(--font-display);
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 4px;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #fff, #ffe2bd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .intro-card h2 {
+      font-family: var(--font-body);
+      font-weight: 300;
+      font-size: 1.15rem;
+      color: var(--evening-gold);
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+    }
+
+    .intro-desc {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: rgba(255, 250, 240, 0.65);
+      margin-bottom: 40px;
+    }
+
+    /* ================================================================
+       PHASE 1: ROOM EXPLORATION
+       ================================================================ */
+    #phase-room {
+      background: radial-gradient(circle at 50% 35%, #2a1b12 0%, #0d0806 100%);
+      flex-direction: column;
+    }
+
+    .room-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: linear-gradient(180deg, rgba(15, 11, 7, 0.9) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .room-header-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: var(--evening-gold);
+      opacity: 0.8;
+      pointer-events: auto;
+    }
+
+    .room-container {
+      width: 100%;
+      max-width: 1024px;
+      height: 70vh;
+      max-height: 600px;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.7), 0 0 50px rgba(255, 171, 76, 0.05);
+      background-color: var(--bg-dark);
+      border: 2px solid rgba(255, 171, 76, 0.15);
+    }
+
+    /* BACK WALL */
+    .room-wall {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 65%;
+      background: var(--wall-base);
+      background-image: repeating-linear-gradient(90deg, 
+        transparent, transparent 38px, 
+        var(--wall-stripe) 38px, var(--wall-stripe) 40px);
+      box-shadow: inset 0 -40px 100px rgba(15, 11, 7, 0.2);
+    }
+
+    /* FLOOR */
+    .room-floor {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 35%;
+      background: linear-gradient(180deg, var(--floor-wood) 0%, var(--floor-shadow) 100%);
+      background-image: repeating-linear-gradient(90deg,
+        transparent, transparent 78px,
+        rgba(0, 0, 0, 0.08) 78px, rgba(0, 0, 0, 0.08) 80px);
+      box-shadow: inset 0 20px 40px rgba(15, 11, 7, 0.4);
+    }
+
+    /* FLOOR RUG */
+    .floor-rug {
+      position: absolute;
+      bottom: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 58%;
+      height: 48%;
+      background: linear-gradient(135deg, #cc5a43, #b54932, #963521);
+      border: 6px solid #782414;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+      opacity: 0.85;
+      background-image: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+    }
+
+    /* WINDOW & SUNSET */
+    .room-window {
+      position: absolute;
+      top: 7%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 190px;
+      height: 180px;
+      z-index: 20;
+    }
+
+    .window-frame {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, var(--evening-warm) 0%, var(--evening-gold) 60%, #ffd700 100%);
+      border: 12px solid var(--wood-dark);
+      border-radius: 8px 8px 4px 4px;
+      position: relative;
+      box-shadow: 
+        0 0 60px rgba(255, 111, 60, 0.3),
+        inset 0 0 20px rgba(15, 11, 7, 0.3);
+      overflow: hidden;
+    }
+
+    .window-panes {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+    }
+    .window-pane-border-h {
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      height: 6px;
+      background: var(--wood-dark);
+      transform: translateY(-50%);
+    }
+    .window-pane-border-v {
+      position: absolute;
+      top: 0; bottom: 0; left: 50%;
+      width: 6px;
+      background: var(--wood-dark);
+      transform: translateX(-50%);
+    }
+
+    /* Window sun */
+    .window-sun {
+      position: absolute;
+      bottom: 12%;
+      left: 35%;
+      width: 50px;
+      height: 50px;
+      background: radial-gradient(circle, #fffdf2 20%, #ffeaa7 60%, rgba(255, 171, 76, 0) 100%);
+      border-radius: 50%;
+      box-shadow: 
+        0 0 35px #fff,
+        0 0 70px var(--evening-gold);
+    }
+
+    /* Soft evening light ray overlay */
+    .window-light-rays {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      height: 280px;
+      background: linear-gradient(180deg, rgba(255, 171, 76, 0.16) 0%, transparent 100%);
+      clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+      pointer-events: none;
+      z-index: 25;
+      mix-blend-mode: screen;
+      animation: ambient-pulse 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes ambient-pulse {
+      0% { opacity: 0.8; }
+      100% { opacity: 1.1; }
+    }
+
+    /* Curtains */
+    .window-curtain {
+      position: absolute;
+      top: -10px;
+      width: 60px;
+      height: 200px;
+      background: linear-gradient(90deg, #9e2a2b, #6e1a24);
+      border-radius: 0 0 10px 10px;
+      z-index: 26;
+      box-shadow: 3px 5px 15px rgba(0,0,0,0.3);
+      transition: transform 0.5s ease;
+    }
+    .window-curtain-left {
+      left: -32px;
+      transform-origin: top left;
+      clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%);
+    }
+    .window-curtain-right {
+      right: -32px;
+      transform-origin: top right;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 20% 100%);
+    }
+    .room-window:hover .window-curtain-left {
+      transform: rotate(-3deg) scaleX(0.92);
+    }
+    .room-window:hover .window-curtain-right {
+      transform: rotate(3deg) scaleX(0.92);
+    }
+
+    .window-rod {
+      position: absolute;
+      top: -14px;
+      left: -42px;
+      right: -42px;
+      height: 10px;
+      background: linear-gradient(180deg, #d4af37, #856a15);
+      border-radius: 5px;
+      z-index: 28;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    /* FAIRY LIGHTS DECORATION */
+    .fairy-wire {
+      position: absolute;
+      top: 5.5%;
+      left: 10%;
+      right: 10%;
+      height: 12px;
+      border-bottom: 2px solid rgba(15, 11, 7, 0.4);
+      border-radius: 50%;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .fairy-lights-container {
+      position: absolute;
+      top: 5.2%;
+      left: 12%;
+      right: 12%;
+      display: flex;
+      justify-content: space-between;
+      z-index: 32;
+      pointer-events: none;
+    }
+
+    .fairy-bulb {
+      width: 9px;
+      height: 13px;
+      border-radius: 50% 50% 40% 40%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor, 0 0 16px currentColor;
+      animation: twinkle-bulb 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes twinkle-bulb {
+      0% { opacity: 0.35; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1.1); }
+    }
+
+    /* STUDY TABLE WITH CRT COMPUTER & BANKERS LAMP */
+    .room-table {
+      position: absolute;
+      left: 4%;
+      bottom: 25%;
+      width: 280px;
+      height: 140px;
+      z-index: 22;
+    }
+
+    .table-woodwork {
+      width: 100%;
+      height: 60px;
+      background: linear-gradient(180deg, var(--wood-light) 0%, var(--wood-dark) 100%);
+      border: 3.5px solid var(--wood-dark);
+      border-radius: 6px 6px 4px 4px;
+      position: relative;
+      box-shadow: 
+        0 6px 15px rgba(0, 0, 0, 0.3),
+        inset 0 2px 4px rgba(255,255,255,0.15);
+    }
+
+    .table-drawers {
+      position: absolute;
+      left: 15px; right: 15px; bottom: 8px;
+      height: 38px;
+      display: flex;
+      gap: 15px;
+    }
+    .table-drawer-panel {
+      flex: 1;
+      border: 2px solid var(--wood-dark);
+      background: #805732;
+      border-radius: 3px;
+      position: relative;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+    }
+    .table-drawer-handle {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 30px;
+      height: 6px;
+      background: #b58a30;
+      border-radius: 3px;
+    }
+
+    .table-legs {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 22px;
+    }
+    .table-leg-post {
+      width: 16px;
+      height: 80px;
+      background: linear-gradient(90deg, var(--wood-dark) 0%, #402712 100%);
+      border-radius: 0 0 4px 4px;
+      box-shadow: 2px 4px 8px rgba(0,0,0,0.4);
+    }
+
+    /* Retro Bankers Desk Lamp (Interactive toggling) */
+    .table-bankers-lamp {
+      position: absolute;
+      right: 18px;
+      top: -55px;
+      width: 35px;
+      height: 55px;
+      cursor: pointer;
+      z-index: 35;
+      transition: transform 0.2s ease;
+    }
+    .table-bankers-lamp:hover {
+      transform: scale(1.05);
+    }
+    .lamp-base {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 22px;
+      height: 8px;
+      background: linear-gradient(90deg, #d4af37, #856a15, #d4af37);
+      border-radius: 3px 3px 0 0;
+      border-bottom: 2px solid #55440c;
+    }
+    .lamp-stem {
+      position: absolute;
+      bottom: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 30px;
+      background: #856a15;
+    }
+    .lamp-shade {
+      position: absolute;
+      top: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 34px;
+      height: 14px;
+      background: linear-gradient(90deg, #27ae60, #1e7e45, #27ae60);
+      border-radius: 6px;
+      border: 1px solid #14552e;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background 0.3s;
+    }
+    
+    /* Desk lamp light ray casting downward */
+    .lamp-light-cone {
+      position: absolute;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 110px;
+      background: linear-gradient(180deg, rgba(255, 235, 140, 0.4) 0%, transparent 100%);
+      clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
+      pointer-events: none;
+      z-index: 30;
+      mix-blend-mode: screen;
+      transition: opacity 0.25s ease;
+      opacity: 1;
+    }
+
+    /* Beige CRT Monitor (Windows XP desktop look) */
+    .table-crt-monitor {
+      position: absolute;
+      left: 20px;
+      top: -72px;
+      width: 86px;
+      height: 75px;
+      z-index: 25;
+    }
+    .crt-case {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #ded8cc 0%, #c4bdb0 100%);
+      border: 4px solid #b3ac9f;
+      border-radius: 8px;
+      position: relative;
+      box-shadow: 
+        0 8px 16px rgba(0,0,0,0.35),
+        inset 0 2px 4px #fff;
+    }
+    .crt-case::before {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 50%;
+      transform: translateX(-50%);
+      width: 45px;
+      height: 4px;
+      background: #aba497;
+    }
+    .crt-neck {
+      position: absolute;
+      bottom: -8px; left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 8px;
+      background: #9e978a;
+      border-radius: 2px;
+    }
+    .crt-stand {
+      position: absolute;
+      bottom: -10px; left: 50%;
+      transform: translateX(-50%);
+      width: 52px;
+      height: 4px;
+      background: #878175;
+      border-radius: 2px;
+    }
+    .crt-screen-frame {
+      position: absolute;
+      top: 5px; left: 5px; right: 5px; bottom: 12px;
+      background: #333;
+      border-radius: 5px;
+      padding: 3px;
+      box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5);
+    }
+    .crt-screen-glass {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #6b8ea2 0%, #3e5361 100%);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+      transition: filter 0.3s;
+    }
+    /* Windows XP "Bliss" pixel background */
+    .crt-bliss-bg {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #5ca2e7 0%, #8ec5fc 50%, #46bf41 55%, #188015 100%);
+      position: relative;
+    }
+    .crt-bliss-bg::before {
+      /* Sun/Cloud hint */
+      content: '';
+      position: absolute;
+      top: 6px; left: 10px;
+      width: 12px;
+      height: 7px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 6px;
+      filter: blur(1px);
+    }
+    /* CRT Scanlines & Glass glare */
+    .crt-scanlines {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+      background-size: 100% 3px, 6px 100%;
+      z-index: 5;
+      pointer-events: none;
+    }
+    .crt-glare {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 50%);
+      z-index: 6;
+      pointer-events: none;
+    }
+    .crt-power-led {
+      position: absolute;
+      bottom: 3px; right: 8px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background-color: #2ecc71;
+      box-shadow: 0 0 4px #2ecc71;
+      animation: led-blink 5s infinite;
+    }
+    @keyframes led-blink {
+      0%, 90%, 100% { opacity: 1; }
+      95% { opacity: 0.3; }
+    }
+
+    /* Floppy Disks / CD Stack on Table */
+    .table-cds {
+      position: absolute;
+      left: 115px;
+      top: -24px;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 1.5px;
+    }
+    .table-cd-case {
+      width: 32px;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-left: 2.5px solid var(--accent-purple);
+      border-radius: 1px;
+      box-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+    }
+
+    /* Stationary Pencil Stand */
+    .table-pen-holder {
+      position: absolute;
+      right: 65px;
+      top: -25px;
+      width: 20px;
+      height: 26px;
+      background: #d15a5a;
+      border-radius: 3px 3px 0 0;
+      box-shadow: 1px 3px 6px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 2px;
+      padding-bottom: 2px;
+    }
+    .station-pencil {
+      width: 2.5px;
+      height: 18px;
+      background: #f39c12;
+      border-radius: 1px;
+      transform: rotate(-5deg);
+    }
+    .station-ruler {
+      width: 3.5px;
+      height: 24px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 1px;
+      transform: rotate(8deg);
+    }
+
+    /* OPEN NOTEBOOK ENVIRONMENTAL CLUE */
+    .table-notebook-clue {
+      position: absolute;
+      left: 51%;
+      top: -22px;
+      transform: translateX(-50%);
+      width: 78px;
+      height: 48px;
+      background: linear-gradient(135deg, #fbf7eb 0%, #ebdcb9 100%);
+      border: 1.5px solid #d4c194;
+      border-radius: 2px 6px 6px 2px;
+      box-shadow: 3px 4px 8px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 34;
+      transition: var(--transition-smooth);
+      padding: 6px 6px 6px 12px;
+      overflow: hidden;
+    }
+    .table-notebook-clue:hover {
+      transform: translateX(-50%) translateY(-3px) scale(1.06);
+      box-shadow: 3px 8px 18px rgba(0,0,0,0.45), 0 0 15px rgba(255, 171, 76, 0.15);
+    }
+    /* Binding spiral rings */
+    .table-notebook-clue::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 9px;
+      background: repeating-linear-gradient(180deg,
+        #bca87b 0px, #bca87b 2px, transparent 2px, transparent 6px);
+      border-right: 1.5px solid #a89467;
+    }
+    .notebook-scribble-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 3.5px;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .notebook-scribble-lines span {
+      display: block;
+      height: 1.5px;
+      background-color: rgba(90, 74, 48, 0.35);
+      border-radius: 1px;
+    }
+    .notebook-scribble-lines span:nth-child(1) { width: 85%; }
+    .notebook-scribble-lines span:nth-child(2) { width: 95%; background-color: rgba(220, 80, 80, 0.4); } /* red margin highlight line */
+    .notebook-scribble-lines span:nth-child(3) { width: 70%; }
+    .notebook-scribble-lines span:nth-child(4) { width: 80%; }
+    .notebook-scribble-lines span:nth-child(5) { width: 45%; }
+
+
+    /* CHILDHOOD BED WITH PLAID SHEETS */
+    .room-bed {
+      position: absolute;
+      right: 4%;
+      bottom: 23%;
+      width: 290px;
+      height: 145px;
+      z-index: 22;
+    }
+
+    .bed-headboard-wood {
+      position: absolute;
+      top: -38px;
+      left: -2px;
+      right: -2px;
+      height: 42px;
+      background: linear-gradient(180deg, var(--wood-dark) 0%, #462c16 100%);
+      border: 3px solid var(--wood-dark);
+      border-radius: 8px 8px 0 0;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+    }
+
+    .bed-frame-structure {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, var(--wood-light) 0%, var(--wood-dark) 100%);
+      border: 3.5px solid var(--wood-dark);
+      border-radius: 6px 6px 8px 8px;
+      position: relative;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    .bed-mattress-layer {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      bottom: 16px;
+      background-color: #5c7e9c;
+      border-radius: 4px;
+      overflow: hidden;
+      /* Plaid/grid sheets patterns common in early 2000s */
+      background-image: 
+        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+        repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(0,0,0,0.05) 8px, rgba(0,0,0,0.05) 10px);
+      background-size: 15px 15px, 15px 15px, auto;
+    }
+
+    .bed-pillow-soft {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 72px;
+      height: 44px;
+      background: linear-gradient(135deg, #ffffff 0%, #eee3d5 100%);
+      border-radius: 8px;
+      box-shadow: 
+        2px 3px 6px rgba(0,0,0,0.18),
+        inset -2px -2px 5px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    /* Cute teddy bear on bed (Hover to breathe/wiggle) */
+    .bed-teddy-bear {
+      position: absolute;
+      top: 10px;
+      right: 25px;
+      font-size: 2.2rem;
+      filter: drop-shadow(2px 4px 5px rgba(0,0,0,0.3));
+      cursor: grab;
+      z-index: 25;
+      animation: bear-breathe 4s ease-in-out infinite alternate;
+      transition: transform 0.3s ease;
+    }
+    .bed-teddy-bear:hover {
+      animation: bear-wiggle 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes bear-breathe {
+      0% { transform: scale(1) rotate(-5deg); }
+      100% { transform: scale(1.06) rotate(3deg); }
+    }
+    @keyframes bear-wiggle {
+      0% { transform: scale(1.1) rotate(-12deg); }
+      100% { transform: scale(1.1) rotate(12deg); }
+    }
+
+    /* SHELF WITH SPINNING GLOBE, BOOKS & CLOCK */
+    .room-shelf {
+      position: absolute;
+      right: 7%;
+      top: 9%;
+      width: 145px;
+      z-index: 22;
+    }
+    .shelf-board {
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, var(--wood-dark) 0%, var(--wood-light) 50%, var(--wood-dark) 100%);
+      border-radius: 2px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.35);
+      margin-bottom: 3px;
+    }
+    .shelf-items-row {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 45px;
+      padding: 0 8px;
+    }
+
+    .shelf-book-vintage {
+      width: 15px;
+      border-radius: 2px 2px 0 0;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+    .shelf-clock-alarm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff 0%, #e0d9cc 100%);
+      border: 2px solid #a83232;
+      box-shadow: 1px 2px 4px rgba(0,0,0,0.25);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.55rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #333;
+      position: relative;
+    }
+    /* Twin bells on the clock */
+    .shelf-clock-alarm::before,
+    .shelf-clock-alarm::after {
+      content: '';
+      position: absolute;
+      top: -4px;
+      width: 10px;
+      height: 6px;
+      background: #a83232;
+      border-radius: 4px 4px 0 0;
+    }
+    .shelf-clock-alarm::before { left: 1px; transform: rotate(-30deg); }
+    .shelf-clock-alarm::after { right: 1px; transform: rotate(30deg); }
+
+    /* Spinning Globe */
+    .shelf-spinning-globe {
+      font-size: 1.45rem;
+      cursor: pointer;
+      display: inline-block;
+      animation: globe-spin-slow 20s linear infinite;
+      transition: animation-duration 0.5s ease;
+      filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.2));
+    }
+    .shelf-spinning-globe:hover {
+      animation-duration: 2s;
+    }
+    @keyframes globe-spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Vintage Game Boy or Console on lower shelf */
+    .shelf-retro-gameboy {
+      width: 24px;
+      height: 34px;
+      background: #cccccc;
+      border: 1.5px solid #a6a6a6;
+      border-radius: 2px;
+      box-shadow: 1px 2px 3px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 2px;
+      position: relative;
+    }
+    .gameboy-screen {
+      width: 16px;
+      height: 12px;
+      background: #8b956d; /* greenish liquid crystal screen */
+      border: 1px solid #5c6349;
+      border-radius: 1px;
+    }
+    .gameboy-dpad {
+      position: absolute;
+      left: 3px; bottom: 8px;
+      width: 6px;
+      height: 6px;
+      background: #404040;
+    }
+    .gameboy-buttons {
+      position: absolute;
+      right: 3px; bottom: 8px;
+      display: flex;
+      gap: 1.5px;
+      transform: rotate(-25deg);
+    }
+    .gameboy-btn {
+      width: 3.5px;
+      height: 3.5px;
+      background: #a82e2e;
+      border-radius: 50%;
+    }
+
+    /* NOSTALGIC WALL POSTERS */
+    .wall-poster {
+      position: absolute;
+      border: 5px solid #fff;
+      box-shadow: 2px 6px 15px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      z-index: 18;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px;
+    }
+    .wall-poster:hover {
+      transform: translateY(-4px) rotate(2deg) scale(1.05);
+      box-shadow: 4px 10px 22px rgba(0,0,0,0.4);
+      z-index: 30;
+    }
+
+    /* Anime/Game character theme poster */
+    .poster-anime {
+      top: 9%;
+      left: 12%;
+      width: 82px;
+      height: 105px;
+      background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
+      transform: rotate(-1.5deg);
+    }
+    .poster-anime-art {
+      width: 100%;
+      height: 70%;
+      background: radial-gradient(circle, #fff7ad 20%, transparent 60%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+    .poster-title {
+      font-family: var(--font-display);
+      font-size: 0.4rem;
+      letter-spacing: 1px;
+      color: #fff;
+      text-align: center;
+      background: rgba(0,0,0,0.4);
+      width: 100%;
+      padding: 1px 0;
+    }
+
+    /* Space/Galaxy adventure poster */
+    .poster-space {
+      top: 14%;
+      left: 28%;
+      width: 70px;
+      height: 90px;
+      background: radial-gradient(circle at center, #1b2a4a 0%, #0a0f1d 100%);
+      transform: rotate(2deg);
+    }
+    .poster-space-art {
+      font-size: 1.35rem;
+      margin-top: 10px;
+      animation: rocket-sway 3s ease-in-out infinite alternate;
+    }
+    @keyframes rocket-sway {
+      0% { transform: translateY(0) rotate(0); }
+      100% { transform: translateY(-4px) rotate(5deg); }
+    }
+
+    /* Nostalgic Calendar showing 2002 */
+    .wall-calendar {
+      top: 10%;
+      left: 41%;
+      width: 48px;
+      height: 52px;
+      background: #fff;
+      border: 1px solid #ddd;
+      box-shadow: 1px 3px 6px rgba(0,0,0,0.15);
+      border-radius: 2px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3px;
+      z-index: 18;
+      font-family: var(--font-body);
+      transform: rotate(-1deg);
+    }
+    .calendar-header {
+      background: #c0392b;
+      color: #fff;
+      font-size: 0.35rem;
+      font-weight: 700;
+      width: 100%;
+      text-align: center;
+      padding: 1px 0;
+      border-radius: 1px;
+      letter-spacing: 0.5px;
+    }
+    .calendar-body {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #333;
+      margin-top: 1px;
+      position: relative;
+    }
+    /* Red circle around birthday */
+    .calendar-body::after {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      border: 1.5px solid #c0392b;
+      border-radius: 50%;
+      opacity: 0.85;
+    }
+    .calendar-year {
+      font-size: 0.32rem;
+      color: #777;
+    }
+
+    /* TOOLTIPS ON HOVER ROOM ITEMS */
+    .room-tooltip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(22, 14, 9, 0.9);
+      border: 1px solid rgba(255, 171, 76, 0.3);
+      color: var(--cream);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 50;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .room-table:hover .room-tooltip,
+    .table-notebook-clue:hover .room-tooltip,
+    .room-bed:hover .room-tooltip,
+    .room-shelf:hover .room-tooltip,
+    .wall-poster:hover .room-tooltip,
+    .wall-calendar:hover .room-tooltip,
+    .memory-box:hover .room-tooltip {
+      opacity: 1;
+    }
+
+    /* BOXES AREA */
+    .boxes-area-floor {
+      position: absolute;
+      bottom: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 60px;
+      z-index: 40;
+    }
+
+    .memory-box {
+      width: 120px;
+      height: 100px;
+      background: linear-gradient(135deg, #dfc29e 0%, #bca17c 100%);
+      border: 3px solid #7c5d39;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 
+        0 10px 22px rgba(0,0,0,0.4),
+        inset 0 2px 3px rgba(255,255,255,0.2);
+      transition: var(--transition-smooth);
+    }
+
+    /* Box lid flap visual */
+    .memory-box::before {
+      content: '';
+      position: absolute;
+      top: -3px; left: -3px; right: -3px;
+      height: 20px;
+      background: linear-gradient(180deg, #ecd6b9 0%, #cbb18e 100%);
+      border: 3px solid #7c5d39;
+      border-bottom: 2px solid #5a4124;
+      border-radius: 4px 4px 2px 2px;
+      transition: transform 0.3s;
+    }
+    
+    /* Packing tape stripe */
+    .memory-box::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 18px;
+      background: rgba(181, 137, 0, 0.45); /* translucent brown duct tape strip */
+      border-left: 1px dashed rgba(15,11,7,0.15);
+      border-right: 1px dashed rgba(15,11,7,0.15);
+    }
+
+    .memory-box:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 
+        0 18px 30px rgba(0,0,0,0.48), 
+        0 0 25px var(--evening-glow);
+    }
+    .memory-box:hover::before {
+      transform: translateY(-5px); /* Lid lifts slightly */
+    }
+
+    .box-symbol {
+      font-size: 2rem;
+      margin-top: 12px;
+      z-index: 10;
+      filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));
+    }
+    .box-tag {
+      font-family: var(--font-hand);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #4a341e;
+      z-index: 10;
+      margin-top: 2px;
+    }
+
+    /* ================================================================
+       NOTEBOOK CLUE LIGHTBOX POPUP
+       ================================================================ */
+    .notebook-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 11, 7, 0.65);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .notebook-modal {
+      width: 440px;
+      max-width: 90%;
+      background: linear-gradient(135deg, #fdfbf7 0%, #faf3df 100%);
+      border: 3px solid #b8a67c;
+      border-radius: 4px 16px 16px 4px;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+      padding: 45px 40px 40px 50px;
+      position: relative;
+      animation: notebook-scale-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Spiral binding holes */
+    .notebook-modal::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 22px;
+      background: repeating-linear-gradient(180deg,
+        #b8a67c 0px, #b8a67c 4px, transparent 4px, transparent 12px);
+      border-right: 2px solid #a2916b;
+    }
+
+    @keyframes notebook-scale-in {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .notebook-modal-close {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #9c8960;
+      transition: color 0.2s;
+    }
+    .notebook-modal-close:hover {
+      color: #333;
+    }
+
+    .notebook-handwritten-text {
+      font-family: var(--font-hand);
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: #3d301b;
+      line-height: 1.8;
+      background-image: linear-gradient(rgba(90, 74, 48, 0.12) 1px, transparent 1px);
+      background-size: 100% 38px;
+      margin-top: 10px;
+      padding-bottom: 10px;
+    }
+    .notebook-handwritten-text u {
+      text-decoration-color: #c0392b;
+      text-decoration-thickness: 2px;
+    }
+
+    /* ================================================================
+       PHASE 2: WRONG BOX (FUTURE / DIAGNOSTIC SCREEN)
+       ================================================================ */
+    #phase-wrong-box {
+      background: radial-gradient(circle at center, #111827 0%, #030712 100%);
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .wrong-card {
+      max-width: 600px;
+      width: 90%;
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid rgba(239, 87, 87, 0.3);
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(239, 87, 87, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      text-align: center;
+    }
+
+    .wrong-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      color: var(--error);
+      letter-spacing: 3px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .wrong-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .wrong-item-box {
+      background: rgba(239, 87, 87, 0.05);
+      border: 1px solid rgba(239, 87, 87, 0.15);
+      border-radius: 8px;
+      padding: 15px 8px;
+      transition: var(--transition-smooth);
+    }
+    .wrong-item-box:hover {
+      background: rgba(239, 87, 87, 0.1);
+      border-color: var(--error);
+      transform: translateY(-2px);
+    }
+    .wrong-emoji {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+    .wrong-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .wrong-desc {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.5);
+      line-height: 1.7;
+      margin-bottom: 30px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding-top: 20px;
+    }
+
+    /* ================================================================
+       PHASE 3: SCRAPBOOK / GALLERY OF 15 CHILDHOOD OBJECTS
+       ================================================================ */
+    #phase-objects {
+      background: radial-gradient(circle at center, #271911 0%, #0a0604 100%);
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 40px 20px;
+    }
+
+    .objects-container {
+      width: 100%;
+      max-width: 1024px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .objects-header {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+    .objects-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      color: #fff;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #fff, var(--evening-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .objects-header p {
+      font-size: 0.9rem;
+      color: rgba(255, 250, 240, 0.55);
+      max-width: 500px;
+      line-height: 1.6;
+    }
+
+    .objects-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 35px;
+    }
+
+    .object-card {
+      background: rgba(35, 23, 15, 0.8);
+      border: 1.5px solid rgba(255, 171, 76, 0.2);
+      border-radius: 12px;
+      padding: 22px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 150px;
+    }
+
+    .object-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(255, 171, 76, 0.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .object-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      border-color: var(--evening-gold);
+      box-shadow: 
+        0 14px 28px rgba(0,0,0,0.45),
+        0 0 15px rgba(255,171,76,0.15);
+      background: rgba(45, 30, 20, 0.85);
+    }
+
+    .object-emoji {
+      font-size: 2.3rem;
+      display: block;
+      margin-bottom: 10px;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .object-card:hover .object-emoji {
+      transform: scale(1.18) rotate(-4deg);
+      animation: object-wiggle 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes object-wiggle {
+      0% { transform: scale(1.18) rotate(-6deg); }
+      100% { transform: scale(1.18) rotate(6deg); }
+    }
+
+    .object-name {
+      font-family: var(--font-hand);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .object-desc {
+      font-size: 0.72rem;
+      color: rgba(255, 250, 240, 0.45);
+      line-height: 1.4;
+      margin-top: auto;
+    }
+
+    /* ================================================================
+       PHASE 4: RIDDLE PHASE
+       ================================================================ */
+    #phase-riddles {
+      background: radial-gradient(circle at center, #271911 0%, #0a0604 100%);
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 30px 20px;
+    }
+
+    .riddle-box-panel {
+      max-width: 650px;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 35px;
+    }
+    .riddle-progress {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--evening-gold);
+      letter-spacing: 3px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      text-shadow: 0 0 5px rgba(255, 171, 76, 0.3);
+    }
+    .riddle-envelope {
+      background: rgba(35, 23, 15, 0.75);
+      border: 1px solid rgba(255, 171, 76, 0.25);
+      border-radius: 12px;
+      padding: 35px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.45);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: relative;
+    }
+    .riddle-quote-text {
+      font-family: var(--font-hand);
+      font-size: 1.6rem;
+      color: var(--cream);
+      line-height: 1.6;
+      font-style: italic;
+      letter-spacing: 0.5px;
+    }
+    .riddle-instruction {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: rgba(255, 250, 240, 0.35);
+      margin-top: 20px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Object choices during riddle */
+    .object-card.solved {
+      opacity: 0.3;
+      pointer-events: none;
+      filter: grayscale(0.8);
+      border-color: rgba(255,255,255,0.05);
+    }
+    .object-card.correct-flash {
+      border-color: var(--success) !important;
+      background: rgba(85, 239, 196, 0.15) !important;
+      box-shadow: 0 0 20px rgba(85, 239, 196, 0.3) !important;
+    }
+    .object-card.wrong-shake {
+      border-color: var(--error) !important;
+      background: rgba(255, 118, 117, 0.15) !important;
+      animation: card-shake-error 0.5s ease;
+    }
+    @keyframes card-shake-error {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    /* ================================================================
+       PHASE 5: DRAG & DROP PHASE
+       ================================================================ */
+    #phase-dragdrop {
+      background: radial-gradient(circle at center, #1e130c 0%, #080504 100%);
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 30px 20px;
+    }
+
+    .dragdrop-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .dragdrop-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: #fff;
+      letter-spacing: 3px;
+      margin-bottom: 8px;
+    }
+    .dragdrop-header p {
+      font-size: 0.85rem;
+      color: rgba(255, 250, 240, 0.5);
+    }
+
+    /* TIMELINE BOARD SLOTS */
+    .reconstruction-timeline-board {
+      display: flex;
+      gap: 20px;
+      padding: 25px 35px;
+      background: rgba(25, 15, 10, 0.7);
+      border: 2px dashed rgba(255, 171, 76, 0.35);
+      border-radius: 16px;
+      margin-bottom: 40px;
+      box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .timeline-slot {
+      width: 120px;
+      height: 140px;
+      border: 2px dashed rgba(255, 171, 76, 0.2);
+      border-radius: 10px;
+      background: rgba(15, 11, 7, 0.4);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      transition: var(--transition-smooth);
+    }
+    .timeline-slot.drag-over-active {
+      border-color: var(--evening-gold);
+      background: rgba(255, 171, 76, 0.08);
+      box-shadow: 0 0 15px rgba(255, 171, 76, 0.15);
+    }
+    .timeline-slot.filled-card {
+      border-style: solid;
+      border-color: var(--success);
+      background: rgba(85, 239, 196, 0.05);
+    }
+    .timeline-slot.filled-card.wrong-placement {
+      border-color: var(--error);
+      background: rgba(255, 118, 117, 0.05);
+    }
+
+    .slot-idx-tag {
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: rgba(255, 171, 76, 0.3);
+      letter-spacing: 1px;
+    }
+    .slot-hint-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: rgba(255, 250, 240, 0.3);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .slot-item-emoji {
+      font-size: 2.3rem;
+      margin-bottom: 8px;
+    }
+    .slot-item-name {
+      font-family: var(--font-hand);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--cream);
+    }
+
+    /* DRAGGABLE CARDSPOOL */
+    .draggables-container-pool {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .draggable-card-node {
+      width: 105px;
+      height: 120px;
+      background: rgba(35, 23, 15, 0.9);
+      border: 1.5px solid rgba(255, 171, 76, 0.25);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: grab;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+      transition: var(--transition-smooth);
+      touch-action: none;
+    }
+    .draggable-card-node:hover {
+      border-color: var(--evening-gold);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.45);
+    }
+    .draggable-card-node:active {
+      cursor: grabbing;
+    }
+    .draggable-card-node.node-dragging-active {
+      opacity: 0.35;
+      transform: scale(0.95);
+    }
+    .draggable-card-node .drag-emoji {
+      font-size: 2rem;
+      margin-bottom: 6px;
+    }
+    .draggable-card-node .drag-name {
+      font-family: var(--font-hand);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cream);
+    }
+
+    /* Drag shadow clone element */
+    .floating-drag-shadow-clone {
+      position: fixed;
+      width: 105px;
+      height: 120px;
+      background: rgba(45, 30, 20, 0.95);
+      border: 2px solid var(--evening-gold);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      z-index: 10000;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 15px rgba(255,171,76,0.25);
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+    .floating-drag-shadow-clone .drag-emoji { font-size: 2rem; }
+    .floating-drag-shadow-clone .drag-name { font-family: var(--font-hand); font-size: 0.95rem; font-weight: 700; color: var(--cream); }
+
+    /* ================================================================
+       PHASE 6: FINAL PHASE (POLAROID PHOTO RESTORE & GLITCH)
+       ================================================================ */
+    #phase-final {
+      background-color: #0b0705;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .restoration-bar-container {
+      width: 340px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+    }
+    .restoration-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--evening-gold), #55efc4);
+      transition: width 1s ease-out;
+    }
+    .restoration-feedback-label {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--evening-gold);
+      letter-spacing: 2px;
+      opacity: 0.7;
+    }
+
+    /* POLAROID FRAME SHAPE */
+    .polaroid-frame {
+      width: 380px;
+      height: 400px;
+      background-color: #f7f5f0;
+      padding: 16px 16px 55px 16px;
+      border-radius: 4px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.65), inset 0 0 10px rgba(0,0,0,0.05);
+      position: relative;
+      overflow: hidden;
+      transform: rotate(-1.5deg) scale(0.9);
+      opacity: 0;
+      transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+    }
+    .polaroid-frame.reveal-active {
+      opacity: 1;
+      transform: rotate(-1.5deg) scale(1);
+    }
+
+    .polaroid-photo-image {
+      width: 100%;
+      height: 100%;
+      background-color: #d8d0c2;
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.25);
+    }
+
+    .polaroid-photo-image svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Glitch states */
+    .polaroid-frame.shaking-glitch {
+      animation: polaroid-shake 0.16s infinite;
+    }
+    @keyframes polaroid-shake {
+      0% { transform: translate(0, 0) rotate(-1.5deg); }
+      20% { transform: translate(-3px, 2px) rotate(-1deg); }
+      40% { transform: translate(3px, -1px) rotate(-2deg); }
+      60% { transform: translate(-2px, -3px) rotate(-1.2deg); }
+      80% { transform: translate(2px, 3px) rotate(-1.8deg); }
+      100% { transform: translate(-1px, -2px) rotate(-1.5deg); }
+    }
+
+    .glitch-scanline-bar {
+      position: absolute;
+      left: 0; right: 0;
+      height: 4px;
+      background: rgba(255, 118, 117, 0.75);
+      mix-blend-mode: screen;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .polaroid-frame.shaking-glitch .glitch-scanline-bar {
+      animation: scanline-flicker 0.4s infinite;
+    }
+    @keyframes scanline-flicker {
+      0% { top: 0%; opacity: 0; }
+      25% { top: 40%; opacity: 0.8; }
+      50% { top: 20%; opacity: 0.3; }
+      75% { top: 80%; opacity: 0.9; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* Polaroid caption text */
+    .polaroid-caption {
+      position: absolute;
+      bottom: 12px;
+      left: 20px;
+      font-family: var(--font-hand);
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: #4a3b2c;
+      letter-spacing: 0.5px;
+    }
+
+    /* Corruption/Glitch Digital Screens Overlay */
+    .digital-corruption-cover {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(0deg,
+        transparent 0px, transparent 2px,
+        rgba(255, 118, 117, 0.12) 2px, rgba(255, 118, 117, 0.12) 4px);
+      z-index: 80;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    .digital-corruption-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: #ff5252;
+      text-shadow: 0 0 12px rgba(255, 82, 82, 0.7);
+      text-align: center;
+      line-height: 2.2;
+      white-space: nowrap;
+      z-index: 90;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ================================================================
+       SYSTEM DIALOG STATUS OVERLAYS
+       ================================================================ */
+    .system-status-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 11, 7, 0.8);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 5000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .system-status-dialog {
+      width: 460px;
+      max-width: 90%;
+      background: #1d1712;
+      border: 2px solid rgba(255, 171, 76, 0.35);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+      animation: dialog-pop-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes dialog-pop-in {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .system-status-dialog.style-success {
+      border-color: rgba(85, 239, 196, 0.4);
+      box-shadow: 0 0 35px rgba(85, 239, 196, 0.15);
+    }
+    .system-status-dialog.style-failure {
+      border-color: rgba(255, 118, 117, 0.4);
+      box-shadow: 0 0 35px rgba(255, 118, 117, 0.15);
+    }
+
+    .dialog-icon {
+      font-size: 2.8rem;
+      margin-bottom: 18px;
+    }
+    .dialog-title {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+    .system-status-dialog.style-success .dialog-title { color: var(--success); }
+    .system-status-dialog.style-failure .dialog-title { color: var(--error); }
+
+    .dialog-subtext {
+      font-size: 0.85rem;
+      color: rgba(255, 250, 240, 0.55);
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    /* ================================================================
+       PARTICLE BURST DUST ELEMENTS
+       ================================================================ */
+    .burst-particle {
+      position: fixed;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 20000;
+      animation: rise-and-fade 1.8s cubic-bezier(0.1, 0.8, 0.1, 1) forwards;
+    }
+    @keyframes rise-and-fade {
+      0% { opacity: 1; transform: translateY(0) scale(1.2); }
+      100% { opacity: 0; transform: translateY(-130px) scale(0.3); }
+    }
+
+    /* ================================================================
+       RESPONSIVE & MOBILE DEVICE OPTIMIZATIONS
+       ================================================================ */
+    @media (max-width: 900px) {
+      .objects-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .objects-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .wrong-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .reconstruction-timeline-board {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        padding: 15px;
+      }
+      .timeline-slot {
+        width: 90px;
+        height: 110px;
+      }
+      .slot-item-emoji {
+        font-size: 1.8rem;
+      }
+      .slot-item-name {
+        font-size: 0.85rem;
+      }
+      .draggable-card-node {
+        width: 85px;
+        height: 100px;
+      }
+      .draggable-card-node .drag-emoji {
+        font-size: 1.6rem;
+      }
+      .draggable-card-node .drag-name {
+        font-size: 0.8rem;
+      }
+      .room-container {
+        height: 60vh;
+      }
+      .room-bed {
+        width: 220px;
+        height: 110px;
+        right: 2%;
+        bottom: 20%;
+      }
+      .bed-headboard-wood {
+        height: 30px;
+        top: -28px;
+      }
+      .room-table {
+        width: 220px;
+        height: 110px;
+        left: 2%;
+        bottom: 20%;
+      }
+      .table-woodwork {
+        height: 50px;
+      }
+      .table-legs {
+        padding: 0 12px;
+      }
+      .table-leg-post {
+        height: 60px;
+        width: 12px;
+      }
+      .table-crt-monitor {
+        width: 72px;
+        height: 63px;
+        top: -60px;
+        left: 10px;
+      }
+      .table-bankers-lamp {
+        right: 10px;
+        top: -46px;
+        width: 28px;
+        height: 46px;
+      }
+      .table-pen-holder {
+        right: 50px;
+        top: -20px;
+      }
+      .table-notebook-clue {
+        width: 68px;
+        height: 42px;
+        top: -18px;
+      }
+      .boxes-area-floor {
+        gap: 30px;
+      }
+      .memory-box {
+        width: 100px;
+        height: 85px;
+      }
+      .polaroid-frame {
+        width: 300px;
+        height: 320px;
+        padding: 12px 12px 42px 12px;
+      }
+      .polaroid-caption {
+        font-size: 1.1rem;
+        bottom: 8px;
+      }
+      .intro-card {
+        padding: 35px 25px;
+      }
+      .intro-card h1 {
+        font-size: 1.7rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .objects-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .reconstruction-timeline-board {
+        padding: 10px;
+      }
+      .timeline-slot {
+        width: 70px;
+        height: 90px;
+      }
+      .slot-item-emoji {
+        font-size: 1.5rem;
+      }
+      .slot-item-name {
+        font-size: 0.75rem;
+      }
+      .draggable-card-node {
+        width: 72px;
+        height: 85px;
+      }
+      .draggable-card-node .drag-emoji {
+        font-size: 1.4rem;
+      }
+      .draggable-card-node .drag-name {
+        font-size: 0.7rem;
+      }
+      .room-shelf { display: none; }
+      .wall-poster { display: none; }
+      .wall-calendar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Warm Floating Particles -->
+  <canvas id="particles-canvas"></canvas>
+  <div class="vignette-ambient"></div>
+  <div class="vignette-warm-pulse" id="vignette-warm-pulse"></div>
+
+  <!-- ================================================================
+       PHASE 0: INTRO SCREEN
+       ================================================================ -->
+  <section class="phase" id="phase-intro">
+    <div class="intro-card">
+      <div class="intro-badge">PROJECT REWIND // SEC_01</div>
+      <h1>MEMORY RECONSTRUCTION</h1>
+      <h2>Sam's Childhood Bedroom</h2>
+      <p class="intro-desc">
+        A fading memory matrix of Sam's bedroom has been isolated.
+        Restore the original state, locate the chronological path, and reconstruct the timeline before the details corrupt forever.
+      </p>
+      <button class="btn-warm" id="btn-begin">INITIATE RESTORATION</button>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       PHASE 1: BEDROOM EXPLORATION
+       ================================================================ -->
+  <section class="phase hidden" id="phase-room">
+    <div class="room-header">
+      <span class="room-header-label">// COGNITIVE_BRIDGE: ONLINE</span>
+      <span class="room-header-label">MEMORY COHERENCE: <strong id="val-integrity-lbl">38%</strong></span>
+    </div>
+
+    <div class="room-container" id="room-canvas-bounds">
+      <!-- WALL -->
+      <div class="room-wall"></div>
+
+      <!-- FLOOR WITH RUG -->
+      <div class="room-floor">
+        <div class="floor-rug"></div>
+      </div>
+
+      <!-- WINDOW & SUNSET LIGHT -->
+      <div class="room-window">
+        <div class="window-rod"></div>
+        <div class="window-curtain window-curtain-left"></div>
+        <div class="window-curtain window-curtain-right"></div>
+        <div class="window-frame">
+          <div class="window-panes">
+            <div></div><div></div><div></div><div></div>
+          </div>
+          <div class="window-pane-border-h"></div>
+          <div class="window-pane-border-v"></div>
+          <div class="window-sun"></div>
+        </div>
+        <div class="window-light-rays"></div>
+      </div>
+
+      <!-- FAIRY WIRE & BULBS -->
+      <div class="fairy-wire"></div>
+      <div class="fairy-lights-container" id="fairy-lights-container"></div>
+
+      <!-- POSTERS -->
+      <div class="wall-poster poster-anime">
+        <div class="poster-anime-art">🌀</div>
+        <div class="poster-title">SPIN WORLD</div>
+        <div class="room-tooltip">Beyblade Poster</div>
+      </div>
+      <div class="wall-poster poster-space">
+        <div class="poster-space-art">🚀</div>
+        <div class="poster-title">GALAXY TOUR</div>
+        <div class="room-tooltip">Space Poster</div>
+      </div>
+      
+      <!-- CALENDAR -->
+      <div class="wall-calendar">
+        <div class="calendar-header">JULY</div>
+        <div class="calendar-body">24</div>
+        <div class="calendar-year">2002</div>
+        <div class="room-tooltip">Wall Calendar</div>
+      </div>
+
+      <!-- SHELF -->
+      <div class="room-shelf">
+        <div class="shelf-items-row">
+          <div class="shelf-book-vintage" style="height:32px; background:#4a69bd;"></div>
+          <div class="shelf-book-vintage" style="height:25px; background:#e55039;"></div>
+          <div class="shelf-clock-alarm">6:05</div>
+          <span class="shelf-spinning-globe">🌍</span>
+        </div>
+        <div class="shelf-board"></div>
+        <div class="shelf-items-row" style="height:38px;">
+          <div class="shelf-book-vintage" style="height:22px; background:#78e08f;"></div>
+          <div class="shelf-retro-gameboy">
+            <div class="gameboy-screen"></div>
+            <div class="gameboy-dpad"></div>
+            <div class="gameboy-buttons">
+              <div class="gameboy-btn"></div>
+              <div class="gameboy-btn"></div>
+            </div>
+          </div>
+          <span style="font-size:1.15rem; margin-bottom:1px;">🦖</span>
+        </div>
+        <div class="shelf-board"></div>
+        <div class="room-tooltip">Nostalgic Books & Toys</div>
+      </div>
+
+      <!-- STUDY TABLE -->
+      <div class="room-table">
+        <div class="table-surface-shadow"></div>
+        
+        <!-- Bankers lamp light overlay -->
+        <div class="lamp-light-cone" id="lamp-light-beam"></div>
+
+        <div class="table-woodwork">
+          <!-- CRT Computer -->
+          <div class="table-crt-monitor">
+            <div class="crt-neck"></div>
+            <div class="crt-stand"></div>
+            <div class="crt-case">
+              <div class="crt-screen-frame">
+                <div class="crt-screen-glass">
+                  <div class="crt-bliss-bg"></div>
+                  <div class="crt-scanlines"></div>
+                  <div class="crt-glare"></div>
+                </div>
+              </div>
+              <div class="crt-power-led"></div>
+            </div>
+            <div class="room-tooltip">CRT Desktop Computer</div>
+          </div>
+
+          <!-- Pencils and Stacked CDs -->
+          <div class="table-pen-holder">
+            <div class="station-pencil"></div>
+            <div class="station-ruler"></div>
+          </div>
+          <div class="table-cds">
+            <div class="table-cd-case" style="border-left-color:#38ada9;"></div>
+            <div class="table-cd-case" style="border-left-color:#e55039;"></div>
+            <div class="table-cd-case" style="border-left-color:#f8c291;"></div>
+          </div>
+
+          <!-- Toggleable Bankers Lamp -->
+          <div class="table-bankers-lamp" id="desk-lamp-trigger">
+            <div class="lamp-stem"></div>
+            <div class="lamp-shade" id="lamp-shade-element"></div>
+            <div class="lamp-base"></div>
+            <div class="room-tooltip">Desk Lamp (Toggle)</div>
+          </div>
+
+          <!-- Lined Notebook Clue -->
+          <div class="table-notebook-clue" id="notebook-clue-trigger">
+            <div class="notebook-scribble-lines">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="room-tooltip">Open Notebook</div>
+          </div>
+
+          <div class="table-drawers">
+            <div class="table-drawer-panel"><div class="table-drawer-handle"></div></div>
+            <div class="table-drawer-panel"><div class="table-drawer-handle"></div></div>
+          </div>
+        </div>
+
+        <div class="table-legs">
+          <div class="table-leg-post"></div>
+          <div class="table-leg-post"></div>
+        </div>
+      </div>
+
+      <!-- BED -->
+      <div class="room-bed">
+        <div class="bed-headboard-wood"></div>
+        <div class="bed-frame-structure">
+          <div class="bed-mattress-layer"></div>
+          <div class="bed-pillow-soft"></div>
+          <div class="bed-teddy-bear">🧸</div>
+        </div>
+        <div class="room-tooltip">Childhood Bed</div>
+      </div>
+
+      <!-- BOXES ON THE FLOOR -->
+      <div class="boxes-area-floor">
+        <div class="memory-box" id="click-box-a" data-box="A">
+          <div class="box-symbol">📦</div>
+          <div class="box-tag">Box A</div>
+          <div class="room-tooltip">Open Box A</div>
+        </div>
+        <div class="memory-box" id="click-box-b" data-box="B">
+          <div class="box-symbol">📦</div>
+          <div class="box-tag">Box B</div>
+          <div class="room-tooltip">Open Box B</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       PHASE 2: WRONG BOX (MODERN FUTURE STUFF)
+       ================================================================ -->
+  <section class="phase hidden" id="phase-wrong-box">
+    <div class="wrong-card">
+      <div class="wrong-title">
+        <span>⚠️</span> CHRONOLOGICAL ANOMALY DETECTED
+      </div>
+      <div class="wrong-grid" id="wrong-objects-grid"></div>
+      <p class="wrong-desc">
+        Warning: This box contains items from Sam's future adult life. These do not belong in a memory dated in the early 2000s. Bridging these items will collapse cognitive stability.
+      </p>
+      <button class="btn-outline" id="btn-wrong-return">← CLOSE BOX & RETURN</button>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       PHASE 3: SCRAPBOOK GALLERY
+       ================================================================ -->
+  <section class="phase hidden" id="phase-objects">
+    <div class="objects-container">
+      <div class="objects-header">
+        <h2>Memory Drawer Opened</h2>
+        <p>You have recovered Sam's childhood belongings. Explore each object to stir forgotten memories before solving the riddles.</p>
+      </div>
+      <div class="objects-grid" id="objects-scrapbook-grid"></div>
+      <button class="btn-warm hidden" id="btn-scrapbook-continue">PROCEED TO RIDDLES →</button>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       PHASE 4: RIDDLES PHASE
+       ================================================================ -->
+  <section class="phase hidden" id="phase-riddles">
+    <div class="riddle-box-panel">
+      <div class="riddle-progress" id="lbl-riddle-progress">Riddle 1 / 5</div>
+      <div class="riddle-envelope">
+        <div class="riddle-quote-text" id="lbl-riddle-text">"I spun through battles without moving my feet."</div>
+        <p class="riddle-instruction">Select the corresponding object below</p>
+      </div>
+    </div>
+    <div class="objects-grid" id="riddle-choices-grid" style="max-width:1024px;"></div>
+  </section>
+
+  <!-- ================================================================
+       PHASE 5: DRAG & DROP PHASE
+       ================================================================ -->
+  <section class="phase hidden" id="phase-dragdrop">
+    <div class="dragdrop-header">
+      <h2>Timeline Reconstruction</h2>
+      <p>Arrange the 5 identified memories in the chronological order described in their riddle progression.</p>
+    </div>
+    
+    <div class="reconstruction-timeline-board" id="timeline-slots-board"></div>
+    <div class="draggables-container-pool" id="draggable-items-pool"></div>
+    
+    <button class="btn-warm hidden" id="btn-verify-order">VERIFY TIMELINE</button>
+  </section>
+
+  <!-- ================================================================
+       PHASE 6: FINAL RESTORED PHOTO & CORRUPTION
+       ================================================================ -->
+  <section class="phase hidden" id="phase-final">
+    <div class="restoration-feedback-label" id="lbl-restoration-status">RECONSTRUCTING COGNITIVE RECORD...</div>
+    <div class="restoration-bar-container">
+      <div class="restoration-bar-fill" id="restoration-progress-bar"></div>
+    </div>
+
+    <div class="polaroid-frame" id="polaroid-frame-element">
+      <div class="polaroid-photo-image" id="polaroid-photo-container">
+        <!-- SVG drawing is rendered here by Javascript -->
+      </div>
+      <div class="glitch-scanline-bar"></div>
+      <div class="digital-corruption-cover" id="corruption-stripes"></div>
+      <div class="digital-corruption-text" id="lbl-corruption-warning"></div>
+      <div class="polaroid-caption" id="lbl-polaroid-caption">Sam & Friends — Class of '99</div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       SYSTEM LIGHTBOX/DIALOG POPUPS
+       ================================================================ -->
+  <!-- Clue Notebook overlay (Lightbox) -->
+  <div class="notebook-overlay hidden" id="clue-notebook-overlay">
+    <div class="notebook-modal">
+      <button class="notebook-modal-close" id="btn-close-notebook">✕</button>
+      <div class="notebook-handwritten-text">
+        "To move forward, focus on the <u>present</u>, not the future."
+      </div>
+    </div>
+  </div>
+
+  <!-- Success/Failure Alert Box -->
+  <div class="system-status-overlay hidden" id="status-overlay">
+    <div class="system-status-dialog" id="status-dialog-card">
+      <div class="dialog-icon" id="status-dialog-icon">✨</div>
+      <div class="dialog-title" id="status-dialog-title">COGNITIVE KEY SOLVED</div>
+      <div class="dialog-subtext" id="status-dialog-subtext">The node has been successfully verified.</div>
+      <button class="btn-warm" id="btn-status-dialog-continue" style="font-size:0.75rem; padding:10px 30px;">CONTINUE</button>
+    </div>
+  </div>
+
+
+  <!-- ================================================================
+       GAME ENGINE & CONFIGURATION
+       ================================================================ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // ==========================================================================
+      // EASY-EDIT CONFIGURATION OBJECT
+      // ==========================================================================
+      const REWIND_CONFIG = {
+        // Correct Box. Options: 'A', 'B' or 'random' (will choose random on reload)
+        correctBox: 'random', 
+        
+        // Narrative description and specifications of the 15 childhood objects
+        childhoodObjects: [
+          { id: "cricket-bat", name: "Cricket Bat", emoji: "🏏", desc: "A worn English willow bat, wrapped in black grip tape and smelling of oil." },
+          { id: "tennis-ball", name: "Tennis Ball", emoji: "🎾", desc: "A green Cosco tennis ball, worn fuzzy from street play against brick walls." },
+          { id: "pokemon-cards", name: "Pokémon Cards", emoji: "🃏", desc: "A stack of cards bound by a rubber band. A holographic Charizard sits on top." },
+          { id: "beyblade", name: "Beyblade", emoji: "🌀", desc: "A heavy metallic Dragoon spinning top, ready for a stadium showdown." },
+          { id: "tazos", name: "Tazos", emoji: "⭕", desc: "A small plastic cylinder stack of discs won from chips packets." },
+          { id: "comic-book", name: "Comic Book", emoji: "📖", desc: "An old Tinkle comic book with dog-eared pages and cartoon doodles." },
+          { id: "toy-car", name: "Toy Car", emoji: "🚗", desc: "A die-cast red Hot Wheels racecar, scratched from tile track races." },
+          { id: "marbles", name: "Marbles", emoji: "🔮", desc: "A cotton pouch filled with clear glass marbles showing colored spirals." },
+          { id: "pencil-box", name: "Pencil Box", emoji: "✏️", desc: "A double-sided magnetic pencil box with a built-in spring sharpener." },
+          { id: "school-badge", name: "School Badge", emoji: "🎖️", desc: "A metal pin crest badge, worn proudly on the school uniform chest pocket." },
+          { id: "birthday-invite", name: "Birthday Invite", emoji: "🎂", desc: "A folded paper invite drawn in glitter glue: 'Come for my 10th Birthday!'" },
+          { id: "sticker-sheet", name: "Sticker Sheet", emoji: "🌟", desc: "A sheet of shiny power-up cartoon stickers, partially peeled." },
+          { id: "water-bottle", name: "Water Bottle", emoji: "🧴", desc: "A plastic Milton bottle with an adjustable strap, smells like school water." },
+          { id: "game-cd", name: "Video Game CD", emoji: "💿", desc: "A jewel case with handwritten CD label: 'Road Rash & GTA III'." },
+          { id: "old-photo", name: "Old Photograph", emoji: "📷", desc: "A faded Polaroid showing three childhood friends smiling with arms linked." }
+        ],
+
+        // Future/Modern objects for the wrong box
+        modernObjects: [
+          { id: "laptop", name: "Sleek Laptop", emoji: "💻" },
+          { id: "smartphone", name: "Smartphone", emoji: "📱" },
+          { id: "id-card", name: "Office ID Card", emoji: "🪪" },
+          { id: "car-keys", name: "Car Fob Keys", emoji: "🔑" },
+          { id: "credit-card", name: "Platinum Card", emoji: "💳" },
+          { id: "earbuds", name: "Wireless Earbuds", emoji: "🎧" },
+          { id: "briefcase", name: "Leather Briefcase", emoji: "💼" },
+          { id: "smartwatch", name: "Smartwatch", emoji: "⌚" }
+        ],
+
+        // 5 Riddles. The chronological order of this list determines the correct drag-and-drop order
+        riddles: [
+          {
+            id: "pencil-box",
+            text: "Every morning, I waited on your desk — holding your colours, your sharpener, and your tiny eraser, all in one place.",
+            answer: "pencil-box"
+          },
+          {
+            id: "toy-car",
+            text: "During boring lectures, I secretly travelled from desk to desk, racing without making a sound.",
+            answer: "toy-car"
+          },
+          {
+            id: "comic-book",
+            text: "Between colourful pages, I carried you to distant lands and impossible adventures.",
+            answer: "comic-book"
+          },
+          {
+            id: "pokemon-cards",
+            text: "After the final bell rang, friends gathered in circles to collect, trade, and battle with me.",
+            answer: "pokemon-cards"
+          },
+          {
+            id: "beyblade",
+            text: "As the evening sun dipped low, I spun through fierce battles without ever moving my feet.",
+            answer: "beyblade"
+          }
+        ],
+
+        // Final photo reveal configuration
+        finalPhoto: {
+          caption: "Sam & Friends — Class of '99",
+          url: "", // Leave empty to render default high-fidelity SVG. Provide image URL to replace.
+          samArea: {
+            left: "48%",
+            top: "40%",
+            width: "16%",
+            height: "26%"
+          }
+        }
+      };
+
+      // Set up random correct box if configured as 'random'
+      let targetCorrectBox = REWIND_CONFIG.correctBox.toUpperCase();
+      if (targetCorrectBox !== 'A' && targetCorrectBox !== 'B') {
+        targetCorrectBox = Math.random() > 0.5 ? 'A' : 'B';
+      }
+
+      // ==========================================================================
+      // ENGINE STATE DATA
+      // ==========================================================================
+      const state = {
+        activePhase: 'intro',
+        lampIsOn: true,
+        riddleIndex: 0,
+        solvedRiddleIds: [],
+        timelineSlots: [null, null, null, null, null],
+        coherenceLevel: 38
+      };
+
+      // ==========================================================================
+      // DOM HELPER & ELEMENT CACHE
+      // ==========================================================================
+      const $ = id => document.getElementById(id);
+
+      const DOM = {
+        canvas: $('particles-canvas'),
+        vignettePulse: $('vignette-warm-pulse'),
+        btnBegin: $('btn-begin'),
+        
+        // Navigation Phases
+        phases: {
+          intro: $('phase-intro'),
+          room: $('phase-room'),
+          wrongBox: $('phase-wrong-box'),
+          objects: $('phase-objects'),
+          riddles: $('phase-riddles'),
+          dragdrop: $('phase-dragdrop'),
+          final: $('phase-final')
+        },
+
+        // Exploration Screen
+        lblCoherence: $('val-integrity-lbl'),
+        fairyContainer: $('fairy-lights-container'),
+        lampBeam: $('lamp-light-beam'),
+        lampShade: $('lamp-shade-element'),
+        lampTrigger: $('desk-lamp-trigger'),
+        notebookClueTrigger: $('notebook-clue-trigger'),
+        clueNotebookOverlay: $('clue-notebook-overlay'),
+        btnCloseNotebook: $('btn-close-notebook'),
+        boxA: $('click-box-a'),
+        boxB: $('click-box-b'),
+
+        // Wrong Box
+        wrongGrid: $('wrong-objects-grid'),
+        btnWrongReturn: $('btn-wrong-return'),
+
+        // Scrapbook
+        scrapbookGrid: $('objects-scrapbook-grid'),
+        btnScrapbookContinue: $('btn-scrapbook-continue'),
+
+        // Riddles
+        lblRiddleProgress: $('lbl-riddle-progress'),
+        lblRiddleText: $('lbl-riddle-text'),
+        riddleChoicesGrid: $('riddle-choices-grid'),
+
+        // Drag & Drop
+        timelineBoard: $('timeline-slots-board'),
+        draggablePool: $('draggable-items-pool'),
+        btnVerifyOrder: $('btn-verify-order'),
+
+        // Final Polaroid Reveal
+        lblRestorationStatus: $('lbl-restoration-status'),
+        progressBar: $('restoration-progress-bar'),
+        polaroidFrame: $('polaroid-frame-element'),
+        photoContainer: $('polaroid-photo-container'),
+        corruptionOverlay: $('corruption-stripes'),
+        lblCorruptionWarning: $('lbl-corruption-warning'),
+        lblPolaroidCaption: $('lbl-polaroid-caption'),
+
+        // System lightbox dialogs
+        statusOverlay: $('status-overlay'),
+        statusCard: $('status-dialog-card'),
+        statusIcon: $('status-dialog-icon'),
+        statusTitle: $('status-dialog-title'),
+        statusSubtext: $('status-dialog-subtext'),
+        btnStatusContinue: $('btn-status-dialog-continue')
+      };
+
+      // ==========================================================================
+      // WEB AUDIO SYNTH SOUND GENERATOR (DYNAMIC RETRO SOUNDS)
+      // ==========================================================================
+      let audioCtx = null;
+
+      function initAudioContext() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+
+      function playTone(freq = 600, duration = 0.15, type = 'sine', volume = 0.08) {
+        initAudioContext();
+        if (!audioCtx) return;
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          
+          gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+          
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (e) {
+          console.warn("Synthesiser tone blocked or unsupported.");
+        }
+      }
+
+      function playClickSound() {
+        playTone(900, 0.06, 'triangle', 0.08);
+      }
+      function playLampClick() {
+        playTone(300, 0.08, 'sawtooth', 0.05);
+        setTimeout(() => playTone(650, 0.05, 'sine', 0.05), 40);
+      }
+      function playChimeSound() {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          setTimeout(() => playTone(freq, 0.35, 'sine', 0.04), idx * 80);
+        });
+      }
+      function playErrorSound() {
+        playTone(180, 0.45, 'sawtooth', 0.08);
+      }
+      function playSuccessChime() {
+        const chord = [261.63, 329.63, 392.00, 523.25, 659.25];
+        chord.forEach((freq, idx) => {
+          setTimeout(() => playTone(freq, 0.5, 'triangle', 0.05), idx * 100);
+        });
+      }
+      function playGlitchZapp() {
+        const now = audioCtx ? audioCtx.currentTime : 0;
+        for (let i = 0; i < 15; i++) {
+          const f = 100 + Math.random() * 800;
+          const d = 0.02 + Math.random() * 0.08;
+          setTimeout(() => playTone(f, d, 'sawtooth', 0.04), i * 35);
+        }
+      }
+
+      // ==========================================================================
+      // AMBIENT DUST & MEMORY PARTICLES SYSTEM
+      // ==========================================================================
+      const ctx = DOM.canvas.getContext('2d');
+      let particleArray = [];
+
+      function handleResize() {
+        DOM.canvas.width = window.innerWidth;
+        DOM.canvas.height = window.innerHeight;
+      }
+      handleResize();
+      window.addEventListener('resize', handleResize);
+
+      class DriftingParticle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * DOM.canvas.width;
+          this.y = Math.random() * DOM.canvas.height;
+          this.vx = (Math.random() - 0.5) * 0.25;
+          this.vy = (Math.random() - 0.5) * 0.25;
+          this.size = Math.random() * 2.5 + 0.8;
+          this.alpha = Math.random() * 0.25 + 0.08;
+          const hue = 32 + Math.random() * 22; // Golden HSL range
+          this.color = `hsla(${hue}, 85%, 68%, ${this.alpha})`;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0 || this.x > DOM.canvas.width) this.vx *= -1;
+          if (this.y < 0 || this.y > DOM.canvas.height) this.vy *= -1;
+        }
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+        }
+      }
+
+      // Spawn ambient particles
+      for (let i = 0; i < 45; i++) {
+        particleArray.push(new DriftingParticle());
+      }
+
+      function animateAmbientParticles() {
+        ctx.clearRect(0, 0, DOM.canvas.width, DOM.canvas.height);
+        particleArray.forEach(p => {
+          p.update();
+          p.draw();
+        });
+        requestAnimationFrame(animateAmbientParticles);
+      }
+      animateAmbientParticles();
+
+      // Explode memory particles at specified coordinate
+      function spawnParticleBurst(x, y, amount = 14) {
+        for (let i = 0; i < amount; i++) {
+          const el = document.createElement('div');
+          el.className = 'burst-particle';
+          const hue = 32 + Math.random() * 28;
+          el.style.backgroundColor = `hsl(${hue}, 90%, 65%)`;
+          el.style.boxShadow = `0 0 8px hsl(${hue}, 90%, 65%)`;
+          el.style.left = (x + (Math.random() - 0.5) * 80) + 'px';
+          el.style.top = (y + (Math.random() - 0.5) * 35) + 'px';
+          el.style.animationDuration = (1.2 + Math.random() * 0.8) + 's';
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 2000);
+        }
+      }
+
+      // ==========================================================================
+      // FAIRY LIGHTS Twinkling Rendering
+      // ==========================================================================
+      const bulbColors = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#ff6b81', '#ffa502', '#70a1ff', '#2ed573', '#ff4757', '#ffa502', '#2ed573'];
+      bulbColors.forEach((colorHex, idx) => {
+        const bulb = document.createElement('div');
+        bulb.className = 'fairy-bulb';
+        bulb.style.color = colorHex;
+        bulb.style.animationDelay = (idx * 0.22) + 's';
+        DOM.fairyContainer.appendChild(bulb);
+      });
+
+      // ==========================================================================
+      // PAGE NAVIGATION FLOW
+      // ==========================================================================
+      function transitToPhase(phaseName) {
+        const curPhaseEl = DOM.phases[state.activePhase];
+        if (curPhaseEl) {
+          curPhaseEl.classList.add('fade-out');
+          setTimeout(() => {
+            curPhaseEl.classList.add('hidden');
+            curPhaseEl.classList.remove('fade-out');
+          }, 800);
+        }
+        setTimeout(() => {
+          DOM.phases[phaseName].classList.remove('hidden');
+          state.activePhase = phaseName;
+          
+          // Custom hooks per screen enter
+          if (phaseName === 'objects') {
+            renderScrapbookGallery();
+          } else if (phaseName === 'riddles') {
+            renderRiddlesPhase();
+          }
+        }, curPhaseEl ? 800 : 0);
+      }
+
+      // Status Dialog Box Modal
+      function triggerStatusModal(styleClass, icon, title, text, nextCallback) {
+        DOM.statusCard.className = `system-status-dialog style-${styleClass}`;
+        DOM.statusIcon.textContent = icon;
+        DOM.statusTitle.textContent = title;
+        DOM.statusSubtext.textContent = text;
+        DOM.statusOverlay.classList.remove('hidden');
+        DOM.btnStatusContinue.onclick = () => {
+          DOM.statusOverlay.classList.add('hidden');
+          if (nextCallback) nextCallback();
+        };
+      }
+
+      // Update system coherence values
+      function updateCoherence(amount) {
+        state.coherenceLevel = Math.min(amount, 98);
+        DOM.lblCoherence.textContent = state.coherenceLevel + '%';
+        DOM.vignettePulse.style.opacity = Math.min((state.coherenceLevel - 38) / 100, 0.65);
+      }
+
+      // ==========================================================================
+      // PHASE 0: BEGIN SCREEN
+      // ==========================================================================
+      DOM.btnBegin.addEventListener('click', () => {
+        initAudioContext();
+        playClickSound();
+        transitToPhase('room');
+      });
+
+      // ==========================================================================
+      // PHASE 1: BEDROOM INTERACTIONS
+      // ==========================================================================
+      
+      // Bankers Lamp clicking to toggle illumination
+      DOM.lampTrigger.addEventListener('click', () => {
+        playLampClick();
+        state.lampIsOn = !state.lampIsOn;
+        if (state.lampIsOn) {
+          DOM.lampBeam.style.opacity = '1';
+          DOM.lampShade.style.background = 'linear-gradient(90deg, #27ae60, #1e7e45, #27ae60)';
+        } else {
+          DOM.lampBeam.style.opacity = '0';
+          DOM.lampShade.style.background = 'linear-gradient(90deg, #195e34, #0f3a20, #195e34)';
+        }
+      });
+
+      // Simple click on globe
+      document.querySelector('.shelf-spinning-globe').addEventListener('click', (e) => {
+        playTone(600 + Math.random() * 200, 0.25, 'triangle', 0.05);
+        const rect = e.target.getBoundingClientRect();
+        spawnParticleBurst(rect.left + rect.width/2, rect.top, 5);
+      });
+
+      // Open Notebook clue popups
+      DOM.notebookClueTrigger.addEventListener('click', () => {
+        playClickSound();
+        DOM.clueNotebookOverlay.classList.remove('hidden');
+      });
+      DOM.btnCloseNotebook.addEventListener('click', () => {
+        playClickSound();
+        DOM.clueNotebookOverlay.classList.add('hidden');
+      });
+
+      // Box clicks
+      DOM.boxA.addEventListener('click', () => triggerBoxOpening('A'));
+      DOM.boxB.addEventListener('click', () => triggerBoxOpening('B'));
+
+      function triggerBoxOpening(boxChar) {
+        playClickSound();
+        if (boxChar === targetCorrectBox) {
+          // Correct Box (Childhood objects)
+          setTimeout(() => {
+            transitToPhase('objects');
+            playChimeSound();
+            spawnParticleBurst(window.innerWidth / 2, window.innerHeight / 2, 28);
+          }, 350);
+        } else {
+          // Wrong Box (Modern future objects)
+          setTimeout(() => {
+            transitToPhase('wrongBox');
+            renderWrongBoxScreen();
+            playErrorSound();
+          }, 350);
+        }
+      }
+
+      // ==========================================================================
+      // PHASE 2: WRONG BOX LOGIC
+      // ==========================================================================
+      function renderWrongBoxScreen() {
+        DOM.wrongGrid.innerHTML = '';
+        REWIND_CONFIG.modernObjects.forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'wrong-item-box';
+          card.style.animation = `dialog-pop-in 0.4s ease ${idx * 0.06}s forwards`;
+          card.style.opacity = '0';
+          card.innerHTML = `<div class="wrong-emoji">${item.emoji}</div><div class="wrong-label">${item.name}</div>`;
+          DOM.wrongGrid.appendChild(card);
+        });
+      }
+
+      DOM.btnWrongReturn.addEventListener('click', () => {
+        playClickSound();
+        transitToPhase('room');
+      });
+
+      // ==========================================================================
+      // PHASE 3: SCRAPBOOK GALLERY LOGIC
+      // ==========================================================================
+      function renderScrapbookGallery() {
+        DOM.scrapbookGrid.innerHTML = '';
+        REWIND_CONFIG.childhoodObjects.forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'object-card';
+          card.style.animation = `dialog-pop-in 0.4s ease ${idx * 0.05}s forwards`;
+          card.style.opacity = '0';
+          card.innerHTML = `
+            <div class="object-emoji">${item.emoji}</div>
+            <div class="object-name">${item.name}</div>
+            <div class="object-desc">${item.desc}</div>
+          `;
+          card.addEventListener('click', (e) => {
+            playTone(850 + Math.random() * 200, 0.12, 'sine', 0.05);
+            const rect = card.getBoundingClientRect();
+            spawnParticleBurst(rect.left + rect.width / 2, rect.top, 5);
+          });
+          DOM.scrapbookGrid.appendChild(card);
+        });
+
+        // Reveal scrapbook exit button after a short delay
+        setTimeout(() => {
+          DOM.btnScrapbookContinue.classList.remove('hidden');
+        }, 1800);
+      }
+
+      DOM.btnScrapbookContinue.addEventListener('click', () => {
+        playClickSound();
+        state.riddleIndex = 0;
+        state.solvedRiddleIds = [];
+        transitToPhase('riddles');
+      });
+
+      // ==========================================================================
+      // PHASE 4: RIDDLE INTERACTION LOGIC
+      // ==========================================================================
+      function renderRiddlesPhase() {
+        const riddle = REWIND_CONFIG.riddles[state.riddleIndex];
+        DOM.lblRiddleProgress.textContent = `Riddle ${state.riddleIndex + 1} / ${REWIND_CONFIG.riddles.length}`;
+        DOM.lblRiddleText.textContent = `"${riddle.text}"`;
+
+        // Render choice card nodes
+        DOM.riddleChoicesGrid.innerHTML = '';
+        REWIND_CONFIG.childhoodObjects.forEach((item, idx) => {
+          const card = document.createElement('div');
+          card.className = 'object-card';
+          card.dataset.id = item.id;
+          
+          if (state.solvedRiddleIds.includes(item.id)) {
+            card.classList.add('solved');
+          }
+
+          card.innerHTML = `
+            <div class="object-emoji">${item.emoji}</div>
+            <div class="object-name">${item.name}</div>
+          `;
+
+          card.addEventListener('click', (e) => handleRiddleResponse(item.id, card));
+          DOM.riddleChoicesGrid.appendChild(card);
+        });
+      }
+
+      function handleRiddleResponse(itemId, cardElement) {
+        const riddle = REWIND_CONFIG.riddles[state.riddleIndex];
+        
+        if (itemId === riddle.answer) {
+          // Correct answer
+          playChimeSound();
+          cardElement.classList.add('correct-flash');
+          state.solvedRiddleIds.push(itemId);
+          
+          const rect = cardElement.getBoundingClientRect();
+          spawnParticleBurst(rect.left + rect.width / 2, rect.top, 14);
+
+          updateCoherence(38 + (state.riddleIndex + 1) * 8);
+
+          setTimeout(() => {
+            state.riddleIndex++;
+            if (state.riddleIndex >= REWIND_CONFIG.riddles.length) {
+              // Completed all riddles -> Move to drag & drop
+              triggerStatusModal(
+                'success',
+                '✨',
+                'COGNITIVE CORRELATION SOLVED',
+                'All 5 nostalgic timeline anchors have been identified. Now align them in the correct sequence.',
+                () => {
+                  transitToPhase('dragdrop');
+                  setTimeout(renderDragDropTimeline, 900);
+                }
+              );
+            } else {
+              renderRiddlesPhase();
+            }
+          }, 800);
+        } else {
+          // Incorrect answer
+          playErrorSound();
+          cardElement.classList.add('wrong-shake');
+          setTimeout(() => cardElement.classList.remove('wrong-shake'), 600);
+        }
+      }
+
+      // ==========================================================================
+      // PHASE 5: DRAG & DROP TIMELINE MECHANICALS
+      // ==========================================================================
+      let activeDragging = {
+        isDragging: false,
+        id: null,
+        srcEl: null,
+        cloneEl: null
+      };
+
+      function renderDragDropTimeline() {
+        state.timelineSlots = [null, null, null, null, null];
+        DOM.btnVerifyOrder.classList.add('hidden');
+
+        // Render blank slots
+        DOM.timelineBoard.innerHTML = '';
+        for (let i = 0; i < 5; i++) {
+          const slot = document.createElement('div');
+          slot.className = 'timeline-slot';
+          slot.dataset.slotIndex = i;
+          slot.innerHTML = `
+            <div class="slot-idx-tag">#0${i + 1}</div>
+            <div class="slot-hint-label">Anchor Point</div>
+          `;
+          DOM.timelineBoard.appendChild(slot);
+        }
+
+        // Render available draggable icons (Shuffled layout)
+        DOM.draggablePool.innerHTML = '';
+        const shuffledList = [...state.solvedRiddleIds].sort(() => Math.random() - 0.5);
+        
+        shuffledList.forEach(id => {
+          const item = REWIND_CONFIG.childhoodObjects.find(o => o.id === id);
+          const el = document.createElement('div');
+          el.className = 'draggable-item-card draggable-card-node';
+          el.dataset.id = item.id;
+          el.innerHTML = `
+            <div class="drag-emoji">${item.emoji}</div>
+            <div class="drag-name">${item.name}</div>
+          `;
+          
+          attachDragListeners(el, item);
+          DOM.draggablePool.appendChild(el);
+        });
+      }
+
+      function attachDragListeners(nodeEl, itemObj) {
+        nodeEl.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          beginDragAction(e, itemObj, nodeEl);
+        });
+        nodeEl.addEventListener('touchstart', (e) => {
+          beginDragAction(e, itemObj, nodeEl);
+        }, { passive: false });
+      }
+
+      function beginDragAction(e, item, element) {
+        e.preventDefault();
+        const pt = fetchInteractionPoint(e);
+
+        // Render flying mirror clone
+        const clone = document.createElement('div');
+        clone.className = 'floating-drag-shadow-clone';
+        clone.innerHTML = `
+          <div class="drag-emoji">${item.emoji}</div>
+          <div class="drag-name">${item.name}</div>
+        `;
+        clone.style.left = pt.x + 'px';
+        clone.style.top = pt.y + 'px';
+        document.body.appendChild(clone);
+
+        element.classList.add('node-dragging-active');
+
+        activeDragging = {
+          isDragging: true,
+          id: item.id,
+          srcEl: element,
+          cloneEl: clone
+        };
+
+        document.addEventListener('mousemove', onDraggingMove);
+        document.addEventListener('mouseup', onDraggingRelease);
+        document.addEventListener('touchmove', onDraggingMove, { passive: false });
+        document.addEventListener('touchend', onDraggingRelease);
+
+        playTone(550, 0.08, 'triangle', 0.06);
+      }
+
+      function onDraggingMove(e) {
+        if (!activeDragging.isDragging) return;
+        e.preventDefault();
+        const pt = fetchInteractionPoint(e);
+
+        activeDragging.cloneEl.style.left = pt.x + 'px';
+        activeDragging.cloneEl.style.top = pt.y + 'px';
+
+        // Check intersections with dropslots
+        document.querySelectorAll('.timeline-slot').forEach(slot => {
+          const bounds = slot.getBoundingClientRect();
+          const isOver = pt.x > bounds.left && pt.x < bounds.right && pt.y > bounds.top && pt.y < bounds.bottom;
+          const idx = parseInt(slot.dataset.slotIndex);
+          
+          slot.classList.toggle('drag-over-active', isOver && !state.timelineSlots[idx]);
+        });
+      }
+
+      function onDraggingRelease(e) {
+        if (!activeDragging.isDragging) return;
+        
+        // Grab endpoints
+        const endPt = fetchInteractionPoint(e.changedTouches ? e : e);
+        let wasPlaced = false;
+
+        document.querySelectorAll('.timeline-slot').forEach(slot => {
+          slot.classList.remove('drag-over-active');
+          const bounds = slot.getBoundingClientRect();
+          const isOver = endPt.x > bounds.left && endPt.x < bounds.right && endPt.y > bounds.top && endPt.y < bounds.bottom;
+          const idx = parseInt(slot.dataset.slotIndex);
+
+          if (isOver && !state.timelineSlots[idx]) {
+            // Register card into timelineslot
+            state.timelineSlots[idx] = activeDragging.id;
+            const item = REWIND_CONFIG.childhoodObjects.find(o => o.id === activeDragging.id);
+            
+            slot.innerHTML = `
+              <div class="slot-item-emoji">${item.emoji}</div>
+              <div class="slot-item-name">${item.name}</div>
+            `;
+            slot.classList.add('filled-card');
+            
+            activeDragging.srcEl.style.display = 'none';
+            wasPlaced = true;
+            
+            playTone(720, 0.12, 'sine', 0.06);
+            spawnParticleBurst(bounds.left + bounds.width/2, bounds.top + bounds.height/2, 8);
+
+            updateCoherence(state.coherenceLevel + 3);
+          }
+        });
+
+        if (!wasPlaced) {
+          activeDragging.srcEl.classList.remove('node-dragging-active');
+        }
+
+        activeDragging.cloneEl.remove();
+        activeDragging = { isDragging: false };
+
+        document.removeEventListener('mousemove', onDraggingMove);
+        document.removeEventListener('mouseup', onDraggingRelease);
+        document.removeEventListener('touchmove', onDraggingMove);
+        document.removeEventListener('touchend', onDraggingRelease);
+
+        // Check if all spots are locked
+        if (state.timelineSlots.every(id => id !== null)) {
+          setTimeout(() => {
+            DOM.btnVerifyOrder.classList.remove('hidden');
+          }, 350);
+        }
+      }
+
+      function fetchInteractionPoint(e) {
+        if (e.changedTouches && e.changedTouches.length) {
+          return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+        }
+        if (e.touches && e.touches.length) {
+          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+      }
+
+      // Verification check on drag timeline sequence
+      DOM.btnVerifyOrder.addEventListener('click', () => {
+        const absoluteSequence = REWIND_CONFIG.riddles.map(r => r.answer);
+        const sequenceMatches = state.timelineSlots.every((id, idx) => id === absoluteSequence[idx]);
+
+        if (sequenceMatches) {
+          // Success
+          playSuccessChime();
+          
+          document.querySelectorAll('.timeline-slot').forEach(slot => {
+            slot.classList.add('filled-card');
+            slot.classList.remove('wrong-placement');
+          });
+
+          triggerStatusModal(
+            'success',
+            '🌟',
+            'TIMELINE SYNC SUCCESSFUL',
+            'Cognitive links aligned. Memory core rendering initiated...',
+            () => {
+              transitToPhase('final');
+              setTimeout(initiateFinalGlitchSequence, 800);
+            }
+          );
+        } else {
+          // Fail
+          playErrorSound();
+          
+          document.querySelectorAll('.timeline-slot').forEach((slot, idx) => {
+            if (state.timelineSlots[idx] !== absoluteSequence[idx]) {
+              slot.classList.add('wrong-placement');
+            }
+          });
+
+          triggerStatusModal(
+            'failure',
+            '⚠️',
+            'TIMELINE RECONSTRUCTION FAILED',
+            'Unstable chronological ripples detected. Alignments reset. Try once more.',
+            () => {
+              renderDragDropTimeline();
+            }
+          );
+        }
+      });
+
+      // ==========================================================================
+      // PHASE 6: FINAL RESTORED PHOTO & GLITCH EFFECTS
+      // ==========================================================================
+      function initiateFinalGlitchSequence() {
+        const fill = DOM.progressBar;
+        const frame = DOM.polaroidFrame;
+        const statusLbl = DOM.lblRestorationStatus;
+        const corruptCover = DOM.corruptionOverlay;
+        const warningTxt = DOM.lblCorruptionWarning;
+
+        // Render photo container (Built-in high fidelity SVG or customized img)
+        DOM.photoContainer.innerHTML = '';
+        if (REWIND_CONFIG.finalPhoto.url) {
+          // Render customized image + relative glitch absolute overlay
+          DOM.photoContainer.innerHTML = `
+            <img src="${REWIND_CONFIG.finalPhoto.url}" style="width:100%; height:100%; object-fit:cover;">
+            <div id="sam-glitch-part" style="
+              position: absolute;
+              left: ${REWIND_CONFIG.finalPhoto.samArea.left};
+              top: ${REWIND_CONFIG.finalPhoto.samArea.top};
+              width: ${REWIND_CONFIG.finalPhoto.samArea.width};
+              height: ${REWIND_CONFIG.finalPhoto.samArea.height};
+              background-image: url('${REWIND_CONFIG.finalPhoto.url}');
+              background-size: 348px 329px; /* photo-inner size approx */
+              background-position: calc(-348px * ${parseFloat(REWIND_CONFIG.finalPhoto.samArea.left) / 100}) calc(-329px * ${parseFloat(REWIND_CONFIG.finalPhoto.samArea.top) / 100});
+              background-repeat: no-repeat;
+              transition: opacity 0.15s;
+              pointer-events: none;
+            "></div>
+          `;
+        } else {
+          // Render detailed fallback SVG
+          DOM.photoContainer.innerHTML = `
+            <svg viewBox="0 0 350 280" xmlns="http://www.w3.org/2000/svg">
+              <!-- Backdrop sky sunset -->
+              <defs>
+                <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ff7979" />
+                  <stop offset="50%" stop-color="#ffbe76" />
+                  <stop offset="100%" stop-color="#f6e58d" />
+                </linearGradient>
+              </defs>
+              <rect width="350" height="280" fill="url(#skyGrad)" rx="2"/>
+              <rect y="190" width="350" height="90" fill="#6ab04c"/>
+              
+              <!-- Redbrick School gate hint -->
+              <rect x="25" y="90" width="80" height="100" fill="#eb4d4b" rx="3"/>
+              <rect x="35" y="105" width="22" height="22" fill="#dff9fb" stroke="#771e1e" stroke-width="1.5"/>
+              <rect x="68" y="105" width="22" height="22" fill="#dff9fb" stroke="#771e1e" stroke-width="1.5"/>
+              <rect x="48" y="145" width="32" height="45" fill="#535c68"/>
+              
+              <!-- Park swing -->
+              <line x1="280" y1="80" x2="260" y2="190" stroke="#535c68" stroke-width="2.5"/>
+              <line x1="280" y1="80" x2="300" y2="190" stroke="#535c68" stroke-width="2.5"/>
+              <line x1="268" y1="130" x2="292" y2="130" stroke="#222" stroke-width="2.5"/>
+              
+              <!-- Potted plants -->
+              <circle cx="160" cy="190" r="10" fill="#4834d4"/>
+              
+              <!-- 5 Children standing side-by-side -->
+              <!-- Child 1: Leftmost -->
+              <g id="figure-child1">
+                <circle cx="110" cy="155" r="11" fill="#fed330"/>
+                <rect x="100" y="166" width="20" height="30" fill="#45aaf2" rx="3"/>
+                <rect x="102" y="196" width="6" height="15" fill="#2d98da"/>
+                <rect x="112" y="196" width="6" height="15" fill="#2d98da"/>
+              </g>
+
+              <!-- Child 2 -->
+              <g id="figure-child2">
+                <circle cx="145" cy="150" r="11" fill="#fed330"/>
+                <rect x="135" y="161" width="20" height="34" fill="#a55eee" rx="3"/>
+                <rect x="137" y="195" width="6" height="15" fill="#333"/>
+                <rect x="147" y="195" width="6" height="15" fill="#333"/>
+              </g>
+
+              <!-- Target Child: Sam (Center figure, glitched later) -->
+              <g id="figure-childsam">
+                <!-- Hair -->
+                <path d="M170,140 Q180,126 190,140 Z" fill="#4b2b18"/>
+                <circle cx="180" cy="146" r="12" fill="#fed330"/>
+                <rect x="169" y="158" width="22" height="38" fill="#eb3b5a" rx="4"/>
+                <rect x="171" y="196" width="7" height="18" fill="#4b6584"/>
+                <rect x="182" y="196" width="7" height="18" fill="#4b6584"/>
+                <!-- Face features -->
+                <circle cx="176" cy="144" r="1.5" fill="#222"/>
+                <circle cx="184" cy="144" r="1.5" fill="#222"/>
+                <path d="M175,150 Q180,154 185,150" stroke="#222" fill="none" stroke-width="1.2"/>
+              </g>
+
+              <!-- Child 4 -->
+              <g id="figure-child4">
+                <circle cx="215" cy="152" r="11" fill="#fed330"/>
+                <rect x="205" y="163" width="20" height="32" fill="#20bf6b" rx="3"/>
+                <rect x="207" y="195" width="6" height="15" fill="#333"/>
+                <rect x="217" y="195" width="6" height="15" fill="#333"/>
+              </g>
+
+              <!-- Child 5 -->
+              <g id="figure-child5">
+                <circle cx="250" cy="156" r="11" fill="#fed330"/>
+                <rect x="240" y="167" width="20" height="28" fill="#f7b731" rx="3"/>
+                <rect x="242" y="195" width="6" height="15" fill="#333"/>
+                <rect x="252" y="195" width="6" height="15" fill="#333"/>
+              </g>
+            </svg>
+          `;
+        }
+
+        // Start progressive timeline restoration bars
+        setTimeout(() => {
+          fill.style.width = '30%';
+          statusLbl.textContent = 'RESTRICTOR LINKING MEMORY CELLS...';
+        }, 300);
+
+        setTimeout(() => {
+          fill.style.width = '65%';
+          statusLbl.textContent = 'RE-ESTABLISHING COGNITIVE VECTOR...';
+        }, 1200);
+
+        setTimeout(() => {
+          fill.style.width = '100%';
+          statusLbl.textContent = 'TIMELINE LOCK SECURED (100%)';
+          
+          updateCoherence(98);
+        }, 2200);
+
+        // Polaroid enters focus
+        setTimeout(() => {
+          frame.classList.add('reveal-active');
+          playTone(880, 0.4, 'sine', 0.05);
+          spawnParticleBurst(window.innerWidth / 2, window.innerHeight / 2 - 50, 35);
+        }, 3300);
+
+        // Static viewing segment (4 seconds)
+
+        // Stage 1: Soft face glitching triggers on Sam
+        setTimeout(() => {
+          const targetNode = REWIND_CONFIG.finalPhoto.url ? $('sam-glitch-part') : $('figure-childsam');
+          if (targetNode) {
+            // Rapid flickers
+            targetNode.style.transition = 'opacity 0.06s';
+            targetNode.style.opacity = '0.2';
+            setTimeout(() => { targetNode.style.opacity = '1'; }, 80);
+            setTimeout(() => { targetNode.style.opacity = '0.3'; }, 220);
+            setTimeout(() => { targetNode.style.opacity = '1'; }, 340);
+            setTimeout(() => { targetNode.style.opacity = '0.1'; }, 580);
+            setTimeout(() => { targetNode.style.opacity = '1'; }, 700);
+          }
+          playTone(280, 0.22, 'sawtooth', 0.06);
+        }, 7500);
+
+        // Stage 2: Heavy frame tremors & chromatic aberrations
+        setTimeout(() => {
+          frame.classList.add('shaking-glitch');
+          const targetNode = REWIND_CONFIG.finalPhoto.url ? $('sam-glitch-part') : $('figure-childsam');
+          if (targetNode) {
+            targetNode.style.opacity = '0.15';
+            targetNode.style.filter = 'hue-rotate(185deg) saturate(3)';
+          }
+          playGlitchZapp();
+        }, 9500);
+
+        // Stage 3: System corruption spreads
+        setTimeout(() => {
+          corruptCover.style.opacity = '0.85';
+          statusLbl.textContent = 'COGNITIVE FAULT DETECTED';
+          statusLbl.style.color = '#ff5252';
+        }, 10800);
+
+        // Stage 4: UNSTABLE WARNING
+        setTimeout(() => {
+          warningTxt.style.opacity = '1';
+          warningTxt.innerHTML = 'MEMORY INTEGRITY UNSTABLE';
+          playTone(160, 0.6, 'sawtooth', 0.08);
+        }, 11400);
+
+        // Stage 5: FILE CORRUPTED
+        setTimeout(() => {
+          warningTxt.innerHTML = 'MEMORY INTEGRITY UNSTABLE<br>FILE CORRUPTED';
+        }, 12800);
+
+        // Stage 6: Disintegration collapse
+        setTimeout(() => {
+          frame.classList.remove('shaking-glitch');
+          frame.style.transition = 'all 1.2s cubic-bezier(0.1, 0.8, 0.1, 1)';
+          frame.style.opacity = '0';
+          frame.style.transform = 'scale(0.8) rotate(-8deg)';
+          
+          warningTxt.style.opacity = '0';
+          corruptCover.style.opacity = '0';
+          DOM.lblPolaroidCaption.style.opacity = '0';
+
+          statusLbl.textContent = 'Target coordinates lost. Cognitive bridge broken.';
+          statusLbl.style.color = 'rgba(255, 250, 240, 0.4)';
+          
+          // Fade warmth out
+          DOM.vignettePulse.style.opacity = '0';
+        }, 14400);
+
+        // Stage 7: Ejection termination
+        setTimeout(() => {
+          fill.style.width = '55%';
+          fill.style.background = 'linear-gradient(90deg, var(--evening-gold), var(--error))';
+          statusLbl.textContent = '// ERROR: EJECTING PHASE_01_BEDROOM.EXE...';
+          statusLbl.style.fontFamily = 'var(--font-mono)';
+          statusLbl.style.fontSize = '0.72rem';
+          statusLbl.style.letterSpacing = '1px';
+        }, 16800);
+      }
+
+    });
+  </script>
+</body>
+</html>

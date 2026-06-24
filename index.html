@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Enter Project Rewind - an advanced scientific memory exploration system. Reconstruct nostalgic childhood memories, salvage unstable layers, and explore the cognitive bridge.">
+  <meta name="keywords" content="Project Rewind, Memory Exploration System, Cognitive Reconstruction, High-fidelity UI">
+  <meta name="author" content="Project Rewind team">
+  <title>Project Rewind – Memory Exploration System</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=Orbitron:wght@400;500;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Memory Particles Canvas -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- Holographic Grid Overlay -->
+  <div class="hologram-screen-filter"></div>
+  <div class="screen-static-glitch" id="glitch-shader"></div>
+
+  <!-- HUD Sound & Status widgets (Top Corner) -->
+  <div class="hud-quick-widget">
+    <span class="hud-connection-status"><span class="pulse-green"></span> COGNITIVE BRIDGE ACTIVE</span>
+    <button id="audio-toggle-btn" class="hud-sound-btn" aria-label="Toggle system synthesiser">
+      <span class="btn-sound-bar"></span>
+      <span id="audio-btn-text">INITIALIZE SYNTH</span>
+    </button>
+  </div>
+
+  <!-- 1. LANDING PAGE (Scientist Portal) -->
+  <section class="portal-landing-view" id="view-landing">
+    <div class="portal-glass-card">
+      <div class="portal-header">
+        <span class="system-code">SYS_STATUS: STANDBY</span>
+        <span class="system-ver">RECON_SUITE v2.1.0</span>
+      </div>
+      
+      <div class="portal-content">
+        <h1 class="portal-main-title">PROJECT REWIND</h1>
+        <h2 class="portal-subtitle">Memory Reconstruction System</h2>
+        
+        <div class="portal-status-badge">
+          <span class="badge-dot"></span>
+          <span class="badge-txt">3 Memory Files Available for Exploration</span>
+        </div>
+        
+        <button class="portal-enter-btn" id="btn-enter-system">
+          <span class="enter-btn-txt">ENTER PROJECT REWIND</span>
+          <span class="enter-btn-glow"></span>
+        </button>
+      </div>
+
+      <div class="portal-footer font-mono">
+        // NEURAL STABILITY: NOMINAL | TARGET SUBJECT: SAM
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. MEMORY SELECTION SCREEN (Lobby Vault) -->
+  <section class="portal-vault-view hidden" id="view-selection">
+    <div class="vault-container">
+      <header class="vault-header">
+        <div class="vault-title-row">
+          <h2 class="vault-title">AVAILABLE MEMORY FILES</h2>
+          <p class="vault-subtitle">Double-click or press Open to bridge connection with Sam's childhood layers.</p>
+        </div>
+        <button class="scientist-btn terminate-btn" id="btn-end-exploration">
+          <span>END EXPLORATION</span>
+        </button>
+      </header>
+
+      <div class="vault-files-grid">
+        
+        <!-- CARD 1: LivingRoom.exe -->
+        <div class="vault-file-card glass-frame" id="card-livingroom" data-target="livingroom">
+          <div class="file-card-inner">
+            <!-- Card Thumbnail Sketch (Premium SVGs) -->
+            <div class="card-thumbnail-container thumb-warm">
+              <svg viewBox="0 0 100 60" class="thumb-vector">
+                <rect x="25" y="15" width="50" height="32" rx="4" fill="none" stroke="#e2a74c" stroke-width="1.5" />
+                <line x1="30" y1="47" x2="20" y2="52" stroke="#e2a74c" stroke-width="1.5" />
+                <line x1="70" y1="47" x2="80" y2="52" stroke="#e2a74c" stroke-width="1.5" />
+                <circle cx="65" cy="31" r="5" fill="#e2a74c" opacity="0.3" />
+                <path d="M48,15 L50,8 M52,15 L50,8" stroke="#e2a74c" stroke-width="1" />
+              </svg>
+              <div class="thumbnail-overlay"></div>
+            </div>
+            
+            <div class="file-card-details">
+              <div class="card-meta-line">
+                <span class="file-icon">🏠</span>
+                <span class="file-name font-mono">LivingRoom.exe</span>
+              </div>
+              <h3 class="file-title">Living Room Memories</h3>
+              <p class="file-desc">Restore damaged childhood audio fragments. Tune in to family broadcasts and jingles.</p>
+              
+              <div class="file-status-strip">
+                <span class="status-indicator-dot val-ready"></span>
+                <span class="status-indicator-txt font-mono" id="lbl-status-livingroom">READY TO MOUNT</span>
+              </div>
+            </div>
+            
+            <button class="file-open-btn">OPEN MEMORY</button>
+          </div>
+        </div>
+
+        <!-- CARD 2: Playground.exe -->
+        <div class="vault-file-card glass-frame" id="card-playground" data-target="playground">
+          <div class="file-card-inner">
+            <!-- Card Thumbnail Sketch -->
+            <div class="card-thumbnail-container thumb-sunset">
+              <svg viewBox="0 0 100 60" class="thumb-vector">
+                <circle cx="50" cy="40" r="18" fill="none" stroke="#d63ebd" stroke-width="1" stroke-dasharray="2 2" />
+                <circle cx="50" cy="40" r="12" fill="none" stroke="#d63ebd" stroke-width="1.5" />
+                <line x1="15" y1="45" x2="85" y2="45" stroke="#d63ebd" stroke-width="1.5" />
+                <line x1="30" y1="20" x2="35" y2="45" stroke="#d63ebd" stroke-width="1" />
+                <line x1="40" y1="20" x2="35" y2="45" stroke="#d63ebd" stroke-width="1" />
+              </svg>
+              <div class="thumbnail-overlay"></div>
+            </div>
+            
+            <div class="file-card-details">
+              <div class="card-meta-line">
+                <span class="file-icon">⚽</span>
+                <span class="file-name font-mono">Playground.exe</span>
+              </div>
+              <h3 class="file-title">Playground Memories</h3>
+              <p class="file-desc">Restore corrupted playground visual spaces. Spot differences and align the sunset focus.</p>
+              
+              <div class="file-status-strip">
+                <span class="status-indicator-dot val-ready"></span>
+                <span class="status-indicator-txt font-mono" id="lbl-status-playground">READY TO MOUNT</span>
+              </div>
+            </div>
+            
+            <button class="file-open-btn">OPEN MEMORY</button>
+          </div>
+        </div>
+
+        <!-- CARD 3: Classroom.exe -->
+        <div class="vault-file-card glass-frame" id="card-classroom" data-target="classroom">
+          <div class="file-card-inner">
+            <!-- Card Thumbnail Sketch -->
+            <div class="card-thumbnail-container thumb-deep">
+              <svg viewBox="0 0 100 60" class="thumb-vector">
+                <rect x="20" y="15" width="60" height="30" fill="none" stroke="#4dbdd6" stroke-width="1.5" />
+                <line x1="25" y1="45" x2="20" y2="52" stroke="#4dbdd6" stroke-width="1" />
+                <line x1="75" y1="45" x2="80" y2="52" stroke="#4dbdd6" stroke-width="1" />
+                <path d="M40,25 L60,25" stroke="#4dbdd6" stroke-dasharray="1 1" />
+                <path d="M45,30 L55,30" stroke="#4dbdd6" stroke-dasharray="1 1" />
+              </svg>
+              <div class="thumbnail-overlay"></div>
+            </div>
+            
+            <div class="file-card-details">
+              <div class="card-meta-line">
+                <span class="file-icon">🏫</span>
+                <span class="file-name font-mono">Classroom.exe</span>
+              </div>
+              <h3 class="file-title">School Classroom</h3>
+              <p class="file-desc">The most unstable critical layer. Conduct deep structural analysis and unlock keys.</p>
+              
+              <div class="file-status-strip">
+                <span class="status-indicator-dot val-ready"></span>
+                <span class="status-indicator-txt font-mono" id="lbl-status-classroom">READY TO MOUNT</span>
+              </div>
+            </div>
+            
+            <button class="file-open-btn">OPEN MEMORY</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 2.5 OBSIDIAN GRAPH WORKSPACE -->
+  <section class="obsidian-workspace hidden" id="view-obsidian-workspace">
+    <!-- Top System Workspace Bar -->
+    <header class="obsidian-top-bar font-mono">
+      <div class="workspace-brand">
+        <span class="pulse-cyan"></span>
+        <span class="system-code">COGNITIVE_SIMULATOR v1.0.4</span>
+      </div>
+      <div class="workspace-metrics">
+        <span>INTEGRITY: <strong id="lbl-obsidian-integrity">34%</strong></span>
+        <span>SECTORS: <strong id="lbl-obsidian-sectors">0 / 3</strong></span>
+      </div>
+      <div class="workspace-actions">
+        <button class="scientist-btn small-btn active-mode" id="btn-toggle-graph-view" title="Toggle Graph Visualizer">GRAPH VIEW</button>
+        <button class="scientist-btn small-btn" id="btn-toggle-classic-view" title="Toggle Classic File Grid">CLASSIC GRID</button>
+        <button class="scientist-btn terminate-btn small-btn" id="btn-obsidian-end-exploration">END EXPLORATION</button>
+      </div>
+    </header>
+
+    <div class="obsidian-layout-wrapper">
+      <!-- Left Sidebar: File Explorer -->
+      <aside class="obsidian-sidebar" id="obsidian-sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-header font-mono">FILE EXPLORER</div>
+          <div class="search-box-container">
+            <input type="text" id="obsidian-file-search" class="scientist-text-input search-input" placeholder="Search files (e.g. Sam, classroom)...">
+          </div>
+          <!-- File Tree -->
+          <div class="file-tree-container" id="obsidian-file-tree">
+            <!-- Root nodes populated dynamically -->
+          </div>
+        </div>
+
+        <div class="sidebar-section tags-section">
+          <div class="sidebar-header font-mono">TAGS</div>
+          <div class="tags-cloud-container" id="obsidian-tags-cloud">
+            <span class="tag-pill" data-tag="system">#system</span>
+            <span class="tag-pill" data-tag="memory">#memory</span>
+            <span class="tag-pill" data-tag="unstable">#unstable</span>
+            <span class="tag-pill" data-tag="secured">#secured</span>
+            <span class="tag-pill" data-tag="clue">#clue</span>
+            <span class="tag-pill" data-tag="audio">#audio</span>
+            <span class="tag-pill" data-tag="visual">#visual</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center Pane: Force-Directed Canvas Graph -->
+      <main class="obsidian-graph-pane">
+        <canvas id="obsidian-graph-canvas"></canvas>
+        
+        <!-- Graph View Floating Controls -->
+        <div class="graph-floating-controls glass-frame">
+          <div class="controls-header font-mono">
+            <span>GRAPH CONFIG</span>
+            <button id="btn-toggle-controls" class="icon-btn">⚙️</button>
+          </div>
+          <div class="controls-body" id="graph-controls-body">
+            <div class="control-row">
+              <label for="slider-gravity">Gravity (Center Pull)</label>
+              <input type="range" id="slider-gravity" min="0.005" max="0.1" step="0.005" value="0.02">
+            </div>
+            <div class="control-row">
+              <label for="slider-repulsion">Node Repulsion (Charge)</label>
+              <input type="range" id="slider-repulsion" min="1000" max="15000" step="500" value="4500">
+            </div>
+            <div class="control-row">
+              <label for="slider-link-dist">Connection Distance</label>
+              <input type="range" id="slider-link-dist" min="50" max="300" step="10" value="130">
+            </div>
+            <div class="control-row checkbox-row">
+              <input type="checkbox" id="chk-show-labels" checked>
+              <label for="chk-show-labels">Show Node Labels</label>
+            </div>
+            <div class="control-row checkbox-row">
+              <input type="checkbox" id="chk-glowing-edges" checked>
+              <label for="chk-glowing-edges">Neon Synapse Glow</label>
+            </div>
+            <div class="control-row">
+              <button class="scientist-btn reset-graph-btn" id="btn-reset-physics">STABILIZE GRAPH</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graph Legend Overlay (Bottom Left) -->
+        <div class="graph-legend font-mono glass-frame">
+          <div class="legend-item"><span class="legend-dot color-folder"></span> Hub Directory</div>
+          <div class="legend-item"><span class="legend-dot color-file"></span> Memory Note</div>
+          <div class="legend-item"><span class="legend-dot color-system"></span> System File</div>
+          <div class="legend-item"><span class="legend-dot color-unstable"></span> Unstable Clue</div>
+          <div class="legend-item"><span class="legend-dot color-secured"></span> Restored Synapse</div>
+        </div>
+      </main>
+
+      <!-- Right Pane: File Reader and Puzzle Decryptor -->
+      <section class="obsidian-note-pane glass-frame" id="obsidian-note-pane">
+        <!-- Default State -->
+        <div class="note-placeholder-state" id="note-placeholder">
+          <div class="placeholder-icon">📂</div>
+          <h3>NO NOTE OPENED</h3>
+          <p>Select a file from the sidebar explorer or double-click a node on the neural graph to load memory diagnostics.</p>
+        </div>
+
+        <!-- Loaded State -->
+        <div class="note-loaded-state hidden" id="note-loaded-content">
+          <!-- Note Header / Tab -->
+          <div class="note-tab-header">
+            <div class="note-tab-title font-mono" id="note-open-filename">Sam_Memory_Core.md</div>
+            <div class="note-tab-mode font-mono">PREVIEW MODE</div>
+          </div>
+
+          <!-- Note Content Scrollable Area -->
+          <div class="note-scroll-body">
+            <!-- Frontmatter block -->
+            <pre class="note-frontmatter font-mono" id="note-frontmatter-block">
+---
+status: corrupted
+type: memory_core
+tags: [sam, host, unresolved]
+---</pre>
+
+            <!-- Rendered Markdown Title & Content -->
+            <div class="note-markdown-renderer">
+              <h1 id="note-title">Sam_Memory_Core</h1>
+              <div id="note-text-content">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- EMBEDDED PUZZLE CONTAINER (Renders inline if node has an active puzzle) -->
+            <div class="note-embedded-decoder-box glass-frame hidden" id="note-puzzle-container">
+              <div class="decoder-title font-mono">📟 SYNAPTIC DECRYPTION ARCHIVE</div>
+              <div class="decoder-inner-body" id="note-puzzle-body">
+                <!-- original rooms components dynamically mounted here -->
+              </div>
+            </div>
+
+            <!-- Backlinks Panel -->
+            <div class="note-backlinks-panel">
+              <div class="backlinks-header font-mono">🔗 LOCAL NEURAL BACKLINKS</div>
+              <ul class="backlinks-list" id="note-backlinks-list">
+                <!-- Populated dynamically -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- 3. TRANSITION OVERLAY SCREEN (Dynamic Memory Loader) -->
+  <section class="memory-transition-view hidden" id="view-loader">
+    <div class="loader-content-box">
+      <div class="loader-synapse-ring"></div>
+      <div class="loader-text-status font-mono" id="loader-status-text">Loading Memory...</div>
+      <div class="loader-progress-bar"><span id="loader-fill-line"></span></div>
+    </div>
+  </section>
+
+  <!-- 4. MEMORY OVERLAYS (THE ACTUAL IMMERSIVE ROOMS - 80% NOSTALGIC, 20% SYSTEM) -->
+  <div class="memory-immersive-container hidden" id="immersive-memory-space">
+    
+    <!-- Top Global Exploration Back Bar -->
+    <div class="memory-exit-header">
+      <div class="active-memory-tag font-mono">// SIGNAL SYNCED: <span id="lbl-active-room-tag">LIVINGROOM.EXE</span></div>
+      <button class="scientist-btn nav-back-btn" id="btn-leave-memory">
+        <span>← RETURN TO VAULT</span>
+      </button>
+    </div>
+
+    <!-- ROOM 1: LIVING ROOM (🏠) -->
+    <section class="room-immersive-panel hidden" id="room-livingroom">
+      <div class="nostalgic-room-background" style="background: radial-gradient(circle at center, rgba(30,16,8,0.7) 0%, rgba(12,6,15,0.95) 100%);">
+        
+        <!-- Environment Canvas Visuals -->
+        <div class="livingroom-furniture-stage">
+          <!-- Evening Window / Clock -->
+          <div class="nostalgic-clock" id="lr-clock-obj">
+            <span class="clock-digits" id="lr-clock-time">06:05</span>
+          </div>
+          <!-- Wall photos -->
+          <div class="nostalgic-frames">
+            <div class="wall-frame frame-1">👪</div>
+            <div class="wall-frame frame-2">🌅</div>
+          </div>
+          
+          <!-- CRT Television (Centerpiece) -->
+          <div class="retro-wooden-tv">
+            <div class="tv-bezel">
+              <div class="tv-glass-screen" id="lr-tv-viewport">
+                <!-- TV static sweeps -->
+                <div class="tv-inner-scanlines"></div>
+                <div class="tv-inner-static" id="lr-tv-noise-overlay"></div>
+                
+                <!-- Display screens -->
+                <div class="tv-inner-video" id="lr-tv-waveform-overlay">
+                  <div class="pulse-wave-ring"></div>
+                </div>
+                
+                <div class="tv-label font-mono" id="lr-tv-screen-caption">SIGNAL LOSS</div>
+              </div>
+              <div class="tv-dials">
+                <span class="dial-turn"></span>
+                <span class="dial-turn"></span>
+                <div class="tv-vent-grill"></div>
+              </div>
+            </div>
+            <div class="tv-wooden-legs">
+              <span class="leg-t"></span><span class="leg-t"></span>
+            </div>
+          </div>
+
+          <!-- Sofa cushioning -->
+          <div class="nostalgic-sofa">
+            <div class="cushion"></div>
+            <div class="cushion"></div>
+            <div class="room-remote-control" id="lr-remote-widget">REMOTE</div>
+          </div>
+        </div>
+
+        <!-- Interactive Rounds Form (Technical UI Minimised) -->
+        <div class="nostalgic-overlay-hud glass-frame">
+          <div class="nostalgic-hud-header font-mono">
+            <span>SYS_BRIDGE: AUDIO RECONSTRUCTION</span>
+            <span class="text-warning">INTEGRITY: 71%</span>
+          </div>
+
+          <div class="nostalgic-hud-body">
+            
+            <!-- R1: Cartoon intro -->
+            <div class="nostalgic-round active-round" id="lr-r1">
+              <h4 class="round-title font-mono">Round 1: Cartoon Audio Fragments</h4>
+              <p class="round-desc">Tap Play. Select the cartoon theme clip from your childhood memories:</p>
+              
+              <div class="audio-strip">
+                <button class="scientist-btn audio-play-btn" id="btn-play-lr-1">▶ PLAY AUDIO</button>
+                <div class="waveform-visualizer" id="wave-vis-1">
+                  <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+              
+              <div class="quiz-choices-stack">
+                <button class="quiz-choice-btn" data-round="1" data-val="Doraemon">Doraemon</button>
+                <button class="quiz-choice-btn" data-round="1" data-val="Shinchan">Shinchan</button>
+                <button class="quiz-choice-btn" data-round="1" data-val="Pokémon">Pokémon</button>
+                <button class="quiz-choice-btn" data-round="1" data-val="Ben 10">Ben 10</button>
+                <button class="quiz-choice-btn" data-round="1" data-val="Tom & Jerry">Tom & Jerry</button>
+              </div>
+            </div>
+
+            <!-- R2: Jingle Break -->
+            <div class="nostalgic-round" id="lr-r2">
+              <h4 class="round-title font-mono">Round 2: Ad Break Chaos</h4>
+              <p class="round-desc">Tap Play. Identify the classic nostalgic TV advertisement jingle:</p>
+              
+              <div class="audio-strip">
+                <button class="scientist-btn audio-play-btn" id="btn-play-lr-2">▶ PLAY AD ARCHIVE</button>
+                <div class="waveform-visualizer" id="wave-vis-2">
+                  <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+              
+              <div class="quiz-choices-stack">
+                <button class="quiz-choice-btn" data-round="2" data-val="Vodafone ZooZoo">Vodafone ZooZoo</button>
+                <button class="quiz-choice-btn" data-round="2" data-val="Airtel">Airtel</button>
+                <button class="quiz-choice-btn" data-round="2" data-val="Nirma">Nirma</button>
+                <button class="quiz-choice-btn" data-round="2" data-val="Pepsi">Pepsi</button>
+                <button class="quiz-choice-btn" data-round="2" data-val="Cadbury">Cadbury</button>
+              </div>
+            </div>
+
+            <!-- R3: Distorted daily sound -->
+            <div class="nostalgic-round" id="lr-r3">
+              <h4 class="round-title font-mono">Round 3: Distorted Audio</h4>
+              <p class="round-desc">Type the name of the household/childhood item matching the sound waves below:</p>
+              
+              <div class="audio-strip">
+                <button class="scientist-btn audio-play-btn" id="btn-play-lr-3">▶ PLAY CORRUPTED SEGMENT</button>
+                <div class="waveform-visualizer" id="wave-vis-3">
+                  <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+              
+              <div class="distorted-input-row">
+                <input type="text" id="input-lr-decode" class="scientist-text-input" placeholder="Type decoded sound...">
+                <button class="scientist-btn" id="btn-submit-lr-3">SUBMIT KEY</button>
+              </div>
+              <div class="input-clue font-mono">Hints: School bell, Cartoon intro, TV startup sound, Telephone ringtone</div>
+            </div>
+
+            <!-- SUCCESS PANEL -->
+            <div class="nostalgic-success-banner font-mono hidden" id="lr-round-success-card">
+              <h4 class="text-success" id="lbl-lr-success-title">Audio Fragment Restored</h4>
+              <p class="text-dim">Synaptic mappings updated. Moving onto the next core sequence.</p>
+              <button class="scientist-btn" id="btn-lr-proceed-round">NEXT STAGE &gt;&gt;</button>
+            </div>
+
+            <!-- COMPLETION PANEL -->
+            <div class="nostalgic-success-banner font-mono hidden" id="lr-memory-restored-card">
+              <h4 class="text-success">LIVING ROOM MEMORY RESTORED</h4>
+              <p>Evening lighting stabilized. CRT TV sweeps completed.</p>
+              <button class="scientist-btn btn-trigger-next-room" data-next="playground">ENTER PLAYGROUND.EXE &gt;&gt;</button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ROOM 2: PLAYGROUND (⚽) -->
+    <section class="room-immersive-panel hidden" id="room-playground">
+      <div class="nostalgic-room-background" style="background: radial-gradient(circle at center, rgba(62,25,48,0.75) 0%, rgba(12,4,18,0.96) 100%);">
+        
+        <!-- Sunset Environment elements -->
+        <div class="playground-furniture-stage">
+          <div class="sunset-back-glow"></div>
+          <!-- Swings -->
+          <div class="play-swing-frame">
+            <svg viewBox="0 0 100 80" class="play-svg-vector">
+              <line x1="20" y1="80" x2="40" y2="20" stroke="rgba(214,62,189,0.3)" stroke-width="1.5" />
+              <line x1="60" y1="80" x2="40" y2="20" stroke="rgba(214,62,189,0.3)" stroke-width="1.5" />
+              <line x1="40" y1="20" x2="40" y2="60" stroke="rgba(214,62,189,0.3)" stroke-dasharray="1 1" />
+              <rect x="34" y="60" width="12" height="2" fill="#d63ebd" />
+            </svg>
+          </div>
+          <!-- Football & Bat -->
+          <div class="play-football-bat">
+            <div class="toy-ball">⚽</div>
+            <div class="toy-bat">🏏</div>
+            <div class="toy-bike">🚲</div>
+          </div>
+          <!-- Large Tree -->
+          <div class="play-tree-silhouette">🌳</div>
+        </div>
+
+        <div class="nostalgic-overlay-hud glass-frame">
+          <div class="nostalgic-hud-header font-mono">
+            <span>SYS_BRIDGE: PLAYGROUND RECONSTRUCTION</span>
+            <span class="text-warning">INTEGRITY: 47%</span>
+          </div>
+
+          <div class="nostalgic-hud-body">
+            
+            <!-- R1: Find difference -->
+            <div class="nostalgic-round active-round" id="pg-r1">
+              <h4 class="round-title font-mono">Round 1: Find The Difference</h4>
+              <p class="round-desc">Spot the 3 corrupted omissions inside Image B to align the visuals:</p>
+              
+              <div class="diff-polaroids-wrapper">
+                <!-- Original A -->
+                <div class="polaroid-holder">
+                  <div class="polaroid-tag font-mono">IMAGE A: ORIGINAL</div>
+                  <div class="polaroid-photo">
+                    <!-- Standard img link configured as requested -->
+                    <img src="images/difference1.jpg" class="jpg-memory-asset" alt="Playground Original" onerror="this.style.display='none'; document.getElementById('svg-diff-a').style.display='block';">
+                    
+                    <!-- SVG Fallback Template -->
+                    <svg id="svg-diff-a" viewBox="0 0 200 120" class="polaroid-svg-fallback">
+                      <path d="M20,110 L25,75 Q15,60 30,50 Q45,60 35,75 Z" fill="#1b2a1a" stroke="#3c5c3a" />
+                      <!-- Swing -->
+                      <line x1="55" y1="100" x2="65" y2="50" stroke="#888" stroke-width="1.5" />
+                      <line x1="75" y1="100" x2="65" y2="50" stroke="#888" stroke-width="1.5" />
+                      <line x1="65" y1="50" x2="65" y2="85" stroke="#777" />
+                      <rect x="60" y="85" width="10" height="2" fill="#fff" />
+                      <!-- Bicycle -->
+                      <circle cx="110" cy="95" r="10" fill="none" stroke="#bd00ff" stroke-width="1" />
+                      <circle cx="130" cy="95" r="10" fill="none" stroke="#bd00ff" stroke-width="1" />
+                      <!-- Football -->
+                      <circle cx="160" cy="95" r="7" fill="#00f3ff" />
+                      <!-- Cricket Bat -->
+                      <line x1="85" y1="95" x2="95" y2="70" stroke="#a05a2c" stroke-width="2" />
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Corrupted B -->
+                <div class="polaroid-holder">
+                  <div class="polaroid-tag font-mono text-warning">IMAGE B: CORRUPTED</div>
+                  <div class="polaroid-photo relative-box">
+                    <img src="images/difference2.jpg" class="jpg-memory-asset" alt="Playground Corrupted" onerror="this.style.display='none'; document.getElementById('svg-diff-b').style.display='block';">
+                    
+                    <!-- SVG Fallback Template with interactive click zones -->
+                    <svg id="svg-diff-b" viewBox="0 0 200 120" class="polaroid-svg-fallback">
+                      <path d="M20,110 L25,75 Q15,60 30,50 Q45,60 35,75 Z" fill="#1b2a1a" stroke="#3c5c3a" />
+                      <!-- Interactive Swing Seat missing -->
+                      <g id="spot-swing" class="spot-click-zone">
+                        <line x1="55" y1="100" x2="65" y2="50" stroke="#888" stroke-width="1.5" />
+                        <line x1="75" y1="100" x2="65" y2="50" stroke="#888" stroke-width="1.5" />
+                        <line x1="62" y1="50" x2="60" y2="80" stroke="#777" id="s-rope-1" />
+                        <line x1="68" y1="50" x2="72" y2="65" stroke="#ff3366" id="s-rope-2" />
+                        <rect x="58" y="80" width="10" height="2" fill="#fff" id="s-seat" style="display:none;" />
+                      </g>
+                      <!-- Interactive Bicycle missing -->
+                      <g id="spot-bicycle" class="spot-click-zone">
+                        <circle cx="110" cy="95" r="10" fill="none" stroke="rgba(255,51,102,0.15)" stroke-dasharray="2 2" id="s-wheel-1" />
+                        <circle cx="130" cy="95" r="10" fill="none" stroke="rgba(255,51,102,0.15)" stroke-dasharray="2 2" id="s-wheel-2" />
+                      </g>
+                      <!-- Interactive Football missing -->
+                      <g id="spot-football" class="spot-click-zone">
+                        <circle cx="160" cy="95" r="7" fill="none" stroke="rgba(255,51,102,0.15)" stroke-dasharray="2 2" id="s-ball" />
+                      </g>
+                      <!-- Bat -->
+                      <line x1="85" y1="95" x2="95" y2="70" stroke="#a05a2c" stroke-width="2" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div class="diff-anom-counter font-mono text-center">
+                ANOMALIES RESOLVED: <span class="text-purple" id="lbl-pg-diff-found">0 / 3</span>
+              </div>
+            </div>
+
+            <!-- R2: Sunset Blur selection -->
+            <div class="nostalgic-round" id="pg-r2">
+              <h4 class="round-title font-mono">Round 2: Blurred Memory</h4>
+              <p class="round-desc">A nostalgic object silhouette is locked in sunset blur. Select the correct visual identity:</p>
+              
+              <div class="sunset-blur-container">
+                <img src="images/blurred1.jpg" class="jpg-memory-asset blurred-img" id="pg-sunset-blur-img" alt="Blurred silhouette" onerror="this.style.display='none'; document.getElementById('svg-blur-sketch').style.display='block';">
+                
+                <!-- Fallback svg -->
+                <div class="sunset-sketch-box" id="svg-blur-sketch">
+                  <div class="sunset-sketch-blur-bg" id="pg-fallback-blur-filter"></div>
+                  <!-- Inline shape bat -->
+                  <svg viewBox="0 0 100 60" class="sk-vector">
+                    <line x1="45" y1="50" x2="55" y2="15" stroke="#fff" stroke-width="3" />
+                    <line x1="43" y1="52" x2="45" y2="50" stroke="#fff" stroke-width="2" />
+                  </svg>
+                </div>
+                
+                <div class="blur-sensor font-mono" id="lbl-pg-blur-status">BLUR SYNC NOMINAL</div>
+              </div>
+
+              <div class="quiz-choices-stack grid-choices">
+                <button class="quiz-choice-btn pg-blur-choice" data-val="cricket bat">cricket bat</button>
+                <button class="quiz-choice-btn pg-blur-choice" data-val="football">football</button>
+                <button class="quiz-choice-btn pg-blur-choice" data-val="bicycle">bicycle</button>
+                <button class="quiz-choice-btn pg-blur-choice" data-val="school bag">school bag</button>
+                <button class="quiz-choice-btn pg-blur-choice" data-val="ice cream cart">ice cream cart</button>
+                <button class="quiz-choice-btn pg-blur-choice" data-val="water bottle">water bottle</button>
+              </div>
+            </div>
+
+            <!-- HIDDEN ANOMALY PHOTO FRAME (2 seconds pop) -->
+            <div class="nostalgic-round" id="pg-r-hidden">
+              <h4 class="round-title font-mono text-danger text-center">BRIDGING COGNITIVE CONFLICT...</h4>
+              <div class="pg-flicker-frame" id="pg-glitchy-photo-frame">
+                <!-- Glitched Photo vector representation -->
+                <svg viewBox="0 0 400 200" class="class-polaroid-photo-canvas">
+                  <g class="friend-group" filter="url(#vector-glitch)">
+                    <path d="M75,160 Q85,110 100,95 Q110,95 110,80 Q110,65 100,65 Q90,65 90,80 Q90,95 95,95 Q75,110 65,160 Z" fill="#220044"/>
+                    <path d="M125,160 Q140,100 155,85 Q170,85 165,70 Q160,50 145,50 Q130,50 130,70 Q130,85 135,85 Q115,100 105,160 Z" fill="#112266"/>
+                    <!-- Glitched Face SAM -->
+                    <path d="M175,160 Q195,90 205,75 Q215,75 215,55 Q215,35 195,35 Q175,35 175,55 Q175,75 185,75 Q165,90 155,160 Z" fill="#ff3366" class="sam-fuzz" />
+                    <path d="M235,160 Q250,105 265,90 Q275,90 275,75 Q275,60 260,60 Q245,60 245,75 Q245,90 250,90 Q230,105 220,160 Z" fill="#112266"/>
+                    <path d="M295,160 Q305,115 320,100 Q330,100 330,85 Q330,70 320,70 Q310,70 310,85 Q310,100 315,100 Q295,115 285,160 Z" fill="#220044"/>
+                  </g>
+                </svg>
+                <div class="hologram-glitch-text font-mono blinking">FILE CORRUPTED</div>
+              </div>
+            </div>
+
+            <!-- SUCCESS PANEL -->
+            <div class="nostalgic-success-banner font-mono hidden" id="pg-round-success-card">
+              <h4 class="text-success" id="lbl-pg-success-title">Visual Fragment Recovered</h4>
+              <p class="text-dim">Synaptic visual alignment synced. Standby for focus patch.</p>
+              <button class="scientist-btn" id="btn-pg-proceed-round">NEXT STAGE &gt;&gt;</button>
+            </div>
+
+            <!-- COMPLETION PANEL -->
+            <div class="nostalgic-success-banner font-mono hidden" id="pg-memory-restored-card">
+              <h4 class="text-success">PLAYGROUND MEMORY RESTORED</h4>
+              <p>Sunset boundaries locked. Visual layers verified.</p>
+              <button class="scientist-btn btn-trigger-next-room" data-next="classroom">ENTER CLASSROOM.EXE &gt;&gt;</button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ROOM 3: CLASSROOM (🏫) -->
+    <section class="room-immersive-panel hidden" id="room-classroom">
+      <div class="nostalgic-room-background" style="background: radial-gradient(circle at center, rgba(16,26,24,0.85) 0%, rgba(5,10,8,0.98) 100%);">
+        
+        <div class="classroom-stage-layout">
+          <!-- Room investigation hotspots (Interactive Desks/Clock/Notice board) -->
+          <div class="classroom-interactive-environment">
+            <!-- Blackboard -->
+            <div class="classroom-hotspot" id="hot-blackboard" data-obj="Blackboard">
+              <img src="images/blackboard.jpg" class="jpg-hotspot-img" alt="Blackboard" onerror="this.style.display='none';">
+              <span class="hotspot-fallback font-mono">BLACKBOARD</span>
+            </div>
+            
+            <!-- Attendance register -->
+            <div class="classroom-hotspot" id="hot-register" data-obj="Register">
+              <img src="images/register.jpg" class="jpg-hotspot-img" alt="Register" onerror="this.style.display='none';">
+              <span class="hotspot-fallback font-mono">REGISTER</span>
+            </div>
+
+            <!-- Notebook on desk -->
+            <div class="classroom-hotspot" id="hot-notebook" data-obj="Notebook">
+              <img src="images/notebook.jpg" class="jpg-hotspot-img" alt="Notebook" onerror="this.style.display='none';">
+              <span class="hotspot-fallback font-mono">NOTEBOOK</span>
+            </div>
+
+            <!-- Class photo frame -->
+            <div class="classroom-hotspot" id="hot-classphoto" data-obj="Photo">
+              <img src="images/classphoto.jpg" class="jpg-hotspot-img" alt="Class Photo" onerror="this.style.display='none';">
+              <span class="hotspot-fallback font-mono">CLASS PHOTO</span>
+            </div>
+
+            <!-- Clock -->
+            <div class="classroom-hotspot" id="hot-clock" data-obj="Clock">
+              <span class="hotspot-fallback font-mono"> frozen clock </span>
+            </div>
+
+            <!-- Desks -->
+            <div class="classroom-hotspot" id="hot-desk" data-obj="WindowDesk">
+              <span class="hotspot-fallback font-mono"> window desk </span>
+            </div>
+
+            <!-- Bag -->
+            <div class="classroom-hotspot" id="hot-bag" data-obj="Bag">
+              <span class="hotspot-fallback font-mono"> school bag </span>
+            </div>
+          </div>
+
+          <!-- Scientist HUD side analyzer console -->
+          <div class="classroom-diagnostic-panel glass-frame">
+            <div class="diag-panel-header font-mono">
+              <span>// RECONSTRUCTION_ANALYZER</span>
+              <span class="text-danger blink">MANUAL_RECON</span>
+            </div>
+            
+            <div class="diag-panel-body" id="class-readout-logs">
+              <p class="font-mono text-dim">&gt; CRITICAL DECAY DETECTED. CLICK RECONSTRUCTION hotspots inside the classroom environment to map the missing variables.</p>
+            </div>
+
+            <!-- Keypad inputs -->
+            <div class="class-verification-box font-mono">
+              <div class="ver-label">Enter Memory Verification Key:</div>
+              <div class="ver-input-row">
+                <input type="text" id="input-class-passcode" class="scientist-text-input passcode-char" maxlength="6" placeholder="KEY">
+                <button class="scientist-btn" id="btn-class-verify">VERIFY</button>
+              </div>
+              <div class="ver-status text-dim" id="lbl-class-verify-status">LOCKED</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 5. SYSTEM CRASH & ENDING SECTION (Safely return/Sam missing) -->
+  <section class="portal-ending-view hidden" id="view-ending">
+    <div class="ending-panel-wrapper font-mono">
+      <div class="searching-loop-stage" id="ending-loader-box">
+        <div class="seeking-dot blink"></div>
+        <p id="lbl-ending-status-1">Searching for Sam...</p>
+        <p id="lbl-ending-status-2" style="display:none;">Searching...</p>
+        <p id="lbl-ending-status-3" style="display:none;">Searching...</p>
+        <p class="text-danger" id="lbl-ending-status-4" style="display:none;">Sam not found.</p>
+      </div>
+
+      <div class="ending-narrative-stage hidden" id="ending-summary-box">
+        <div class="warning-banner-flicker">⚠️ CORE COGNITIVE DISCONNECT ⚠️</div>
+        
+        <div class="summary-paragraph font-sans">
+          <p>All participants are safely returned to the present.</p>
+          <p class="text-danger text-heavy">Except Sam.</p>
+          <p>While his friends wake up outside Project Rewind, Sam remains trapped somewhere inside the memories.</p>
+        </div>
+
+        <div class="final-haunting-sentence font-sans" id="ending-haunting-line">
+          "If Project Rewind was built to save Sam's memories, why is he trapped inside them?"
+        </div>
+      </div>
+
+      <div class="absolute-fadeout-black hidden" id="ending-final-black">
+        <div class="centered-phase-title font-header">END OF PHASE 1</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script src="script.js"></script>
+</body>
+</html>
